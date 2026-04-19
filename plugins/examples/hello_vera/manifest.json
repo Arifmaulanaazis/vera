@@ -1,0 +1,10 @@
+{
+  "id": "hello_vera",
+  "name": "Hello VERA",
+  "version": "1.0.0",
+  "author": "VERA Team",
+  "description": "Example plugin that adds a Hello World node",
+  "entry_module": "hello_vera.py"
+}
+
+

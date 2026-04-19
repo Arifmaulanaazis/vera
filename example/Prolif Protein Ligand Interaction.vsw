@@ -1,0 +1,215 @@
+{
+  "nodes": [
+    {
+      "id": "node_2310435210944",
+      "type": "prolif_interaction",
+      "title": "ProLIF Interaction",
+      "properties": {
+        "protein_index": 0,
+        "ligand_index": 0
+      },
+      "position": {
+        "x": -290.0,
+        "y": -360.0
+      },
+      "size": {
+        "w": 520.0,
+        "h": 660.0
+      },
+      "inputs": [
+        "protein",
+        "ligand"
+      ],
+      "outputs": [
+        "interactions_table"
+      ]
+    },
+    {
+      "id": "node_2310536427840",
+      "type": "pdb_reader",
+      "title": "PDB Reader",
+      "properties": {
+        "file_paths": ""
+      },
+      "position": {
+        "x": -698.0,
+        "y": -329.0
+      },
+      "size": {
+        "w": 200.0,
+        "h": 100.0
+      },
+      "inputs": [
+        "files",
+        "file"
+      ],
+      "outputs": [
+        "molecules"
+      ]
+    },
+    {
+      "id": "node_2310435221504",
+      "type": "file_input",
+      "title": "File Input",
+      "properties": {
+        "file_paths": ""
+      },
+      "position": {
+        "x": -1075.0,
+        "y": -347.0
+      },
+      "size": {
+        "w": 260.0,
+        "h": 120.0
+      },
+      "inputs": [],
+      "outputs": [
+        "files",
+        "file",
+        "file_paths"
+      ]
+    },
+    {
+      "id": "node_2310536234880",
+      "type": "sdf_reader",
+      "title": "SDF Reader",
+      "properties": {
+        "file_paths": ""
+      },
+      "position": {
+        "x": -671.0,
+        "y": -40.0
+      },
+      "size": {
+        "w": 200.0,
+        "h": 100.0
+      },
+      "inputs": [
+        "files",
+        "file"
+      ],
+      "outputs": [
+        "molecules"
+      ]
+    },
+    {
+      "id": "node_2310536315776",
+      "type": "file_input",
+      "title": "File Input",
+      "properties": {
+        "file_paths": ""
+      },
+      "position": {
+        "x": -1068.0,
+        "y": -67.0
+      },
+      "size": {
+        "w": 260.0,
+        "h": 120.0
+      },
+      "inputs": [],
+      "outputs": [
+        "files",
+        "file",
+        "file_paths"
+      ]
+    },
+    {
+      "id": "node_2310536568000",
+      "type": "table_view",
+      "title": "Table View",
+      "properties": {},
+      "position": {
+        "x": 321.0,
+        "y": -382.0
+      },
+      "size": {
+        "w": 360.0,
+        "h": 220.0
+      },
+      "inputs": [
+        "data"
+      ],
+      "outputs": []
+    },
+    {
+      "id": "node_2310435150976",
+      "type": "save_dataframe",
+      "title": "Save DataFrame",
+      "properties": {
+        "output_path": "",
+        "file_type": "auto",
+        "overwrite": true,
+        "include_index": false
+      },
+      "position": {
+        "x": 327.0,
+        "y": 32.0
+      },
+      "size": {
+        "w": 320.0,
+        "h": 155.0
+      },
+      "inputs": [
+        "data"
+      ],
+      "outputs": [
+        "saved_file"
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "conn_2310435221184",
+      "source_node": "node_2310536427840",
+      "source_port": "molecules",
+      "target_node": "node_2310435210944",
+      "target_port": "protein",
+      "label": "molecules"
+    },
+    {
+      "id": "conn_2310435225088",
+      "source_node": "node_2310435221504",
+      "source_port": "file",
+      "target_node": "node_2310536427840",
+      "target_port": "file",
+      "label": "file"
+    },
+    {
+      "id": "conn_2310535948544",
+      "source_node": "node_2310536234880",
+      "source_port": "molecules",
+      "target_node": "node_2310435210944",
+      "target_port": "ligand",
+      "label": "molecules"
+    },
+    {
+      "id": "conn_2310435284544",
+      "source_node": "node_2310536315776",
+      "source_port": "file",
+      "target_node": "node_2310536234880",
+      "target_port": "file",
+      "label": "file"
+    },
+    {
+      "id": "conn_2310536620864",
+      "source_node": "node_2310435210944",
+      "source_port": "interactions_table",
+      "target_node": "node_2310536568000",
+      "target_port": "data",
+      "label": "data"
+    },
+    {
+      "id": "conn_2310536686208",
+      "source_node": "node_2310435210944",
+      "source_port": "interactions_table",
+      "target_node": "node_2310435150976",
+      "target_port": "data",
+      "label": "data"
+    }
+  ],
+  "metadata": {
+    "version": "1.0",
+    "created_with": "Vera"
+  }
+}

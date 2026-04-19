@@ -1,0 +1,152 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>VERA 3D Viewer (Embed)</title>
+    <style>
+      html, body {
+        height: 100%;
+        margin: 0;
+        overflow: hidden;
+        background: #000;
+      }
+      #viewport {
+        width: 100%;
+        height: 100%;
+      }
+      /* No extra UI — purely the 3D canvas */
+      .stats {
+        position: absolute;
+        bottom: 12px;
+        left: 12px;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(12px);
+        padding: 6px 10px;
+        border-radius: 4px;
+        font-size: 11px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: rgba(255, 255, 255, 0.85);
+        pointer-events: none;
+      }
+    </style>
+    <script>
+      function getParam(name) {
+        try { return new URL(window.location.href).searchParams.get(name); } catch (e) { return null; }
+      }
+
+      function loadNGL() {
+        const sources = [
+          './vendor/ngl.js',
+          './ngl.js',
+          'https://cdn.jsdelivr.net/npm/ngl@2.2.1/dist/ngl.js',
+          'https://unpkg.com/ngl@2.2.1/dist/ngl.js'
+        ];
+        function tryLoad(i) {
+          if (i >= sources.length) { console.error('Failed to load NGL.js'); return; }
+          const s = document.createElement('script');
+          s.src = sources[i];
+          s.onload = initViewer;
+          s.onerror = () => tryLoad(i + 1);
+          document.head.appendChild(s);
+        }
+        tryLoad(0);
+      }
+
+      let stage = null;
+      let loadedComponents = [];
+
+      async function initViewer() {
+        if (typeof NGL === 'undefined') { console.error('NGL not available'); return; }
+        stage = new NGL.Stage('viewport', {
+          backgroundColor: getParam('bg') || '#000000',
+          tooltip: false,
+          quality: 'medium'
+        });
+        window.addEventListener('resize', () => stage.handleResize());
+
+        // Load from URL params (same schema as main viewer)
+        const proteinUrl = getParam('protein');
+        const ligandUrl = getParam('ligand');
+        const moleculesData = getParam('molecules_data');
+        const pdbCode = getParam('pdb_code');
+
+        try {
+          if (proteinUrl) await stage.loadFile(decodeURIComponent(proteinUrl)).then(c => { c.addRepresentation('cartoon', { colorScheme: 'sstruc' }); loadedComponents.push(c); });
+          if (ligandUrl) await stage.loadFile(decodeURIComponent(ligandUrl)).then(c => { c.addRepresentation('licorice', { colorScheme: 'element' }); loadedComponents.push(c); });
+          if (moleculesData) {
+            const pdbText = atob(decodeURIComponent(moleculesData));
+            const blob = new Blob([pdbText], { type: 'text/plain' });
+            await stage.loadFile(blob, { ext: 'pdb' }).then(c => {
+              // Heuristic: protein vs small molecule
+              try {
+                const st = c.structure || {};
+                const atomCount = st.atomCount || 0;
+                const residueCount = st.residueCount || 0;
+                if (residueCount > 150 || atomCount > 500) c.addRepresentation('cartoon', { colorScheme: 'sstruc' });
+                else c.addRepresentation('licorice', { colorScheme: 'element' });
+              } catch (e) { c.addRepresentation('licorice', { colorScheme: 'element' }); }
+              loadedComponents.push(c);
+            });
+          }
+          if (pdbCode && !proteinUrl) {
+            const url = `https://files.rcsb.org/download/${pdbCode.toUpperCase()}.pdb`;
+            await stage.loadFile(url, { ext: 'pdb' }).then(c => { c.addRepresentation('cartoon', { colorScheme: 'sstruc' }); loadedComponents.push(c); });
+          }
+        } catch (e) { console.error('Failed to load structures in embed viewer:', e); }
+
+        // Optional spin
+        try { if ((getParam('spin') || '0') === '1') stage.setSpin(true); } catch (e) {}
+
+        // Fit view
+        try { stage.autoView(); } catch (e) {}
+
+        // Start FPS counter
+        try { startFPSCounter(); } catch (e) {}
+        // Update atom count once everything settled
+        try { setTimeout(updateAtomCount, 150); } catch (e) {}
+      }
+
+      function startFPSCounter() {
+        let lastTime = performance.now();
+        let frames = 0;
+        function tick() {
+          const now = performance.now();
+          frames += 1;
+          if (now - lastTime >= 1000) {
+            const fps = Math.round(frames * 1000 / (now - lastTime));
+            const fpsEl = document.getElementById('fps');
+            if (fpsEl) fpsEl.textContent = String(fps);
+            frames = 0;
+            lastTime = now;
+          }
+          requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+      }
+
+      function updateAtomCount() {
+        try {
+          let total = 0;
+          loadedComponents.forEach(c => {
+            try { if (c && c.structure && typeof c.structure.atomCount === 'number') total += c.structure.atomCount; } catch (e) {}
+          });
+          const el = document.getElementById('atom-count');
+          if (el) el.textContent = total > 0 ? total.toLocaleString() : '--';
+        } catch (e) {}
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', loadNGL);
+      } else {
+        loadNGL();
+      }
+    </script>
+  </head>
+  <body>
+    <div id="viewport"></div>
+    <div class="stats" id="stats">FPS: <span id="fps">--</span> | Atoms: <span id="atom-count">--</span></div>
+  </body>
+</html>
+
+

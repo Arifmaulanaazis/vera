@@ -1,0 +1,125 @@
+{
+  "nodes": [
+    {
+      "id": "node_2309826555840",
+      "type": "pubchem_search",
+      "title": "PubChem Search",
+      "properties": {
+        "query": "",
+        "selected_column": "",
+        "available_query_columns": [],
+        "needs_user_action": false,
+        "max_workers": 4
+      },
+      "position": {
+        "x": -568.0,
+        "y": 2.0
+      },
+      "size": {
+        "w": 360.0,
+        "h": 150.0
+      },
+      "inputs": [
+        "query",
+        "data"
+      ],
+      "outputs": [
+        "data"
+      ]
+    },
+    {
+      "id": "node_2310435279616",
+      "type": "text_input",
+      "title": "Text Input",
+      "properties": {
+        "text": "",
+        "placeholder": "Type here\u2026"
+      },
+      "position": {
+        "x": -979.0,
+        "y": -200.0
+      },
+      "size": {
+        "w": 280.0,
+        "h": 120.0
+      },
+      "inputs": [],
+      "outputs": [
+        "string"
+      ]
+    },
+    {
+      "id": "node_2310535730112",
+      "type": "table_view",
+      "title": "Table View",
+      "properties": {},
+      "position": {
+        "x": 26.0,
+        "y": -331.0
+      },
+      "size": {
+        "w": 360.0,
+        "h": 220.0
+      },
+      "inputs": [
+        "data"
+      ],
+      "outputs": []
+    },
+    {
+      "id": "node_2310535732096",
+      "type": "save_dataframe",
+      "title": "Save DataFrame",
+      "properties": {
+        "output_path": "",
+        "file_type": "auto",
+        "overwrite": true,
+        "include_index": false
+      },
+      "position": {
+        "x": 43.0,
+        "y": 72.0
+      },
+      "size": {
+        "w": 320.0,
+        "h": 140.0
+      },
+      "inputs": [
+        "data"
+      ],
+      "outputs": [
+        "saved_file"
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "conn_2310434840960",
+      "source_node": "node_2310435279616",
+      "source_port": "string",
+      "target_node": "node_2309826555840",
+      "target_port": "query",
+      "label": "string"
+    },
+    {
+      "id": "conn_2310535732352",
+      "source_node": "node_2309826555840",
+      "source_port": "data",
+      "target_node": "node_2310535730112",
+      "target_port": "data",
+      "label": "data"
+    },
+    {
+      "id": "conn_2310535844032",
+      "source_node": "node_2309826555840",
+      "source_port": "data",
+      "target_node": "node_2310535732096",
+      "target_port": "data",
+      "label": "data"
+    }
+  ],
+  "metadata": {
+    "version": "1.0",
+    "created_with": "Vera"
+  }
+}

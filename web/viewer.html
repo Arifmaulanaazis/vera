@@ -1,0 +1,1352 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>VERA 3D Viewer</title>
+    <style>
+      * { box-sizing: border-box; }
+      
+      html, body { 
+        height: 100%; 
+        margin: 0; 
+        overflow: hidden; 
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: #000;
+        color: #fff;
+      }
+      
+      #viewport {
+        width: 100%;
+        height: 100%;
+      }
+      
+      .control-panel {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        width: 280px;
+        max-height: calc(100vh - 40px);
+        overflow-y: auto;
+        z-index: 1000;
+        pointer-events: auto;
+      }
+      
+      .control-panel::-webkit-scrollbar {
+        width: 4px;
+      }
+      
+      .control-panel::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      
+      .control-panel::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 2px;
+      }
+      
+      .panel {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        margin-bottom: 12px;
+        overflow: hidden;
+        font-size: 13px;
+      }
+      
+      .panel-header {
+        padding: 12px 16px;
+        background: rgba(255, 255, 255, 0.02);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        font-weight: 500;
+        cursor: pointer;
+        user-select: none;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        transition: background-color 0.2s ease;
+      }
+      
+      .panel-header:hover {
+        background: rgba(255, 255, 255, 0.05);
+      }
+      
+      .panel-header::after {
+        content: '−';
+        font-size: 16px;
+        line-height: 1;
+        transition: transform 0.2s ease;
+      }
+      
+      .panel-header.collapsed::after {
+        transform: rotate(90deg);
+        content: '+';
+      }
+      
+      .panel-content {
+        padding: 16px;
+        transition: all 0.2s ease;
+      }
+      
+      .panel-content.collapsed {
+        display: none;
+      }
+      
+      .control-group {
+        margin-bottom: 16px;
+      }
+      
+      .control-group:last-child {
+        margin-bottom: 0;
+      }
+      
+      label {
+        display: block;
+        margin-bottom: 6px;
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.8);
+        font-weight: 400;
+      }
+      
+      input, select, button {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 4px;
+        background: rgba(255, 255, 255, 0.05);
+        color: #fff;
+        font-size: 12px;
+        font-family: inherit;
+        transition: all 0.2s ease;
+      }
+      
+      input:focus, select:focus {
+        outline: none;
+        border-color: rgba(66, 153, 225, 0.6);
+        background: rgba(255, 255, 255, 0.08);
+      }
+      
+      button {
+        background: rgba(255, 255, 255, 0.1);
+        cursor: pointer;
+        font-weight: 400;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+      
+      button:hover {
+        background: rgba(255, 255, 255, 0.15);
+      }
+      
+      button:active {
+        background: rgba(255, 255, 255, 0.2);
+      }
+      
+      .checkbox-group {
+        display: flex;
+        align-items: center;
+        margin-bottom: 8px;
+        padding: 4px 0;
+      }
+      
+      .checkbox-group input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+        margin-right: 8px;
+        flex-shrink: 0;
+      }
+      
+      .checkbox-group label {
+        margin-bottom: 0;
+        cursor: pointer;
+        flex: 1;
+        font-size: 12px;
+      }
+      
+      .slider-group {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      
+      .slider-group input[type="range"] {
+        flex: 1;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 2px;
+        outline: none;
+        padding: 0;
+      }
+      
+      .slider-group input[type="range"]::-webkit-slider-thumb {
+        appearance: none;
+        width: 14px;
+        height: 14px;
+        background: #fff;
+        border-radius: 50%;
+        cursor: pointer;
+      }
+      
+      .slider-value {
+        min-width: 35px;
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.6);
+        text-align: right;
+      }
+      
+      .color-input {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      
+      .color-input input[type="color"] {
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 4px;
+        background: transparent;
+        cursor: pointer;
+      }
+      
+      .preset-buttons {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+        margin-bottom: 12px;
+      }
+      
+      .preset-buttons button {
+        padding: 6px 8px;
+        font-size: 11px;
+        font-weight: 400;
+      }
+      
+      .structure-item {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 4px;
+        padding: 8px 12px;
+        margin-bottom: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 12px;
+      }
+      
+      .structure-name {
+        flex: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      
+      .structure-controls {
+        display: flex;
+        gap: 4px;
+        margin-left: 8px;
+      }
+      
+      .structure-controls button {
+        width: auto;
+        padding: 2px 6px;
+        font-size: 10px;
+        min-width: unset;
+      }
+      
+      .info-card {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 4px;
+        padding: 12px;
+        margin-bottom: 8px;
+        font-size: 12px;
+      }
+      
+      .info-card h4 {
+        margin: 0 0 8px 0;
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 13px;
+        font-weight: 500;
+      }
+      
+      .info-card p {
+        margin: 0;
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.7);
+        line-height: 1.4;
+      }
+      
+      .loading, .error {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 2000;
+        text-align: center;
+        padding: 20px;
+        border-radius: 8px;
+        backdrop-filter: blur(20px);
+      }
+      
+      .loading {
+        background: rgba(0, 0, 0, 0.7);
+        color: #fff;
+        display: none;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      
+      .error {
+        background: rgba(220, 38, 38, 0.8);
+        color: white;
+        display: none;
+        border: 1px solid rgba(239, 68, 68, 0.5);
+      }
+      
+      .toolbar {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        display: flex;
+        gap: 8px;
+        z-index: 1000;
+      }
+      
+      .toolbar button {
+        width: 36px;
+        height: 36px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 6px;
+        color: rgba(255, 255, 255, 0.8);
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+      
+      .toolbar button:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+      }
+      
+      .stats {
+        position: absolute;
+        bottom: 20px;
+        left: 20px;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(20px);
+        padding: 8px 12px;
+        border-radius: 4px;
+        font-size: 11px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.8);
+      }
+      
+      .toggle-panel {
+        position: absolute;
+        top: 20px;
+        right: 315px;
+        width: 24px;
+        height: 36px;
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 6px 0 0 6px;
+        border-right: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 12px;
+        transition: all 0.2s ease;
+        z-index: 1001;
+      }
+      
+      .toggle-panel:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.9);
+      }
+      
+      .control-panel.hidden {
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+      }
+      
+      .control-panel.hidden + .toggle-panel {
+        right: 20px;
+        border-radius: 6px;
+        border-right: 1px solid rgba(255, 255, 255, 0.1);
+      }
+    </style>
+    <!-- NGL.js loader -->
+    <script>
+      function loadNGL() {
+        const sources = [
+          './vendor/ngl.js',
+          './ngl.js',
+          'https://cdn.jsdelivr.net/npm/ngl@2.2.1/dist/ngl.js',
+          'https://unpkg.com/ngl@2.2.1/dist/ngl.js'
+        ];
+
+        function tryLoad(index) {
+          if (index >= sources.length) {
+            console.error('Failed to load NGL.js from all sources');
+            showError('Failed to load NGL.js library. Place ngl.js in web/vendor/ngl.js for offline use.');
+            return;
+          }
+
+          const script = document.createElement('script');
+          script.src = sources[index];
+          script.onload = function () {
+            console.log('NGL.js loaded from:', sources[index]);
+            initViewer();
+          };
+          script.onerror = function () {
+            console.warn('Failed to load NGL.js from:', sources[index]);
+            tryLoad(index + 1);
+          };
+          document.head.appendChild(script);
+        }
+
+        tryLoad(0);
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', loadNGL);
+      } else {
+        loadNGL();
+      }
+    </script>
+  </head>
+  <body>
+    <div id="viewport"></div>
+    
+    <div class="loading" id="loading">
+      <div style="font-size: 16px; margin-bottom: 8px;">Loading structure...</div>
+    </div>
+    
+    <div class="error" id="error"></div>
+    
+    <div class="toolbar">
+      <button onclick="resetView()" title="Reset View">🏠</button>
+      <button onclick="centerView()" title="Center">📍</button>
+      <button onclick="fullscreen()" title="Fullscreen">⛶</button>
+    </div>
+    
+    <div class="stats" id="stats">
+      FPS: <span id="fps">--</span> | Atoms: <span id="atom-count">--</span>
+    </div>
+    
+    <div class="toggle-panel" onclick="toggleControlPanel()">‹</div>
+    
+    <div class="control-panel" id="control-panel">
+      <!-- Loaded Structures Panel -->
+      <div class="panel">
+        <div class="panel-header" onclick="togglePanel(this)">
+          Structures
+        </div>
+        <div class="panel-content" id="structures-list">
+          <p style="color: rgba(255,255,255,0.5); font-size: 11px; text-align: center; margin: 8px 0;">No structures loaded</p>
+        </div>
+      </div>
+      
+      <!-- Representation Panel -->
+      <div class="panel">
+        <div class="panel-header" onclick="togglePanel(this)">
+          Representation
+        </div>
+        <div class="panel-content">
+          <div class="control-group">
+            <div class="preset-buttons">
+              <button onclick="applyPreset('cartoon')">Cartoon</button>
+              <button onclick="applyPreset('surface')">Surface</button>
+              <button onclick="applyPreset('licorice')">Licorice</button>
+              <button onclick="applyPreset('spacefill')">Spacefill</button>
+            </div>
+          </div>
+          
+          <div class="control-group">
+            <div class="checkbox-group">
+              <input type="checkbox" id="show-cartoon" onchange="updateRepresentations()">
+              <label for="show-cartoon">Cartoon</label>
+            </div>
+            <div class="checkbox-group">
+              <input type="checkbox" id="show-surface" onchange="updateRepresentations()">
+              <label for="show-surface">Surface</label>
+            </div>
+            <div class="checkbox-group">
+              <input type="checkbox" id="show-licorice" onchange="updateRepresentations()">
+              <label for="show-licorice">Licorice</label>
+            </div>
+            <div class="checkbox-group">
+              <input type="checkbox" id="show-ball-stick" onchange="updateRepresentations()">
+              <label for="show-ball-stick">Ball & Stick</label>
+            </div>
+            <div class="checkbox-group">
+              <input type="checkbox" id="show-spacefill" onchange="updateRepresentations()">
+              <label for="show-spacefill">Spacefill</label>
+            </div>
+          </div>
+          
+          <div class="control-group">
+            <label>Color Scheme:</label>
+            <select id="color-scheme" onchange="updateRepresentations()">
+              <option value="sstruc">Secondary Structure</option>
+              <option value="element">Element</option>
+              <option value="residueindex">Residue Index</option>
+              <option value="chainid">Chain ID</option>
+              <option value="hydrophobicity">Hydrophobicity</option>
+              <option value="bfactor">B-factor</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Visual Settings Panel -->
+      <div class="panel">
+        <div class="panel-header" onclick="togglePanel(this)">
+          Display
+        </div>
+        <div class="panel-content">
+          <div class="control-group">
+            <label>Background:</label>
+            <div class="color-input">
+              <input type="color" id="bg-color" value="#000000" onchange="updateBackground()">
+              <input type="text" id="bg-color-text" value="#000000" onchange="updateBackgroundFromText()">
+            </div>
+          </div>
+          
+          <div class="control-group">
+            <label>Surface Opacity:</label>
+            <div class="slider-group">
+              <input type="range" id="surface-opacity" min="0" max="1" step="0.1" value="0.6" onchange="updateSurfaceOpacity()">
+              <span class="slider-value" id="surface-opacity-value">0.6</span>
+            </div>
+          </div>
+          
+          <div class="control-group">
+            <label>Quality:</label>
+            <select id="cartoon-quality" onchange="updateRepresentations()">
+              <option value="low">Low</option>
+              <option value="medium" selected>Medium</option>
+              <option value="high">High</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Animation Panel -->
+      <div class="panel">
+        <div class="panel-header" onclick="togglePanel(this)">
+          Animation
+        </div>
+        <div class="panel-content">
+          <div class="control-group">
+            <div class="checkbox-group">
+              <input type="checkbox" id="auto-spin" onchange="toggleSpin()">
+              <label for="auto-spin">Auto Rotate</label>
+            </div>
+          </div>
+          
+          <div class="control-group">
+            <label>Speed:</label>
+            <div class="slider-group">
+              <input type="range" id="spin-speed" min="0.1" max="2" step="0.1" value="1" onchange="updateSpinSpeed()">
+              <span class="slider-value" id="spin-speed-value">1.0</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Information Panel -->
+      <div class="panel">
+        <div class="panel-header" onclick="togglePanel(this)">
+          Info
+        </div>
+        <div class="panel-content" id="info-content">
+          <p style="color: rgba(255,255,255,0.5); font-size: 11px; text-align: center; margin: 8px 0;">Load a structure to view details</p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Global variables
+      let stage = null;
+      let loadedComponents = [];
+      let representations = {};
+      // Entity entries represent fine-grained items (protein chains, ligands, etc.)
+      // Each entry: { component, category, name, sele, reps: {main: Representation, label?: Representation}, visible }
+      let entityEntries = [];
+      
+      function showLoading(show = true) {
+        document.getElementById('loading').style.display = show ? 'block' : 'none';
+      }
+      
+      function showError(message) {
+        console.error('Viewer error:', message);
+        const errorEl = document.getElementById('error');
+        errorEl.textContent = message;
+        errorEl.style.display = 'block';
+        showLoading(false);
+        setTimeout(() => { errorEl.style.display = 'none'; }, 5000);
+      }
+      
+      function getParam(name) { 
+        const u = new URL(window.location.href); 
+        return u.searchParams.get(name); 
+      }
+      
+      // Initialize viewer
+      function initViewer() {
+        if (typeof NGL === 'undefined') {
+          showError('NGL.js library failed to load properly.');
+          return;
+        }
+        
+        console.log('Initializing NGL viewer...');
+        
+        try {
+          stage = new NGL.Stage('viewport', { 
+            backgroundColor: getParam('bg') || '#000000',
+            tooltip: true
+          });
+          
+          window.addEventListener('resize', () => stage.handleResize(), false);
+          // Initialize UI controls from URL
+          try { initializeUIFromParams(); } catch (e) { /* noop */ }
+
+          // Ensure a clean slate every initialization
+          try { clearAll(); } catch (e) { /* noop */ }
+          
+          // Initialize FPS counter
+          let lastTime = performance.now();
+          let frameCount = 0;
+          
+          function updateStats() {
+            const now = performance.now();
+            frameCount++;
+            
+            if (now - lastTime >= 1000) {
+              const fps = Math.round(frameCount * 1000 / (now - lastTime));
+              document.getElementById('fps').textContent = fps;
+              frameCount = 0;
+              lastTime = now;
+            }
+            
+            requestAnimationFrame(updateStats);
+          }
+          updateStats();
+          
+          // Load initial data from URL parameters
+          loadFromURLParams();
+          
+        } catch (error) {
+          console.error('Error initializing NGL viewer:', error);
+          showError(`Failed to initialize 3D viewer: ${error.message}`);
+        }
+      }
+      
+      // URL parameter loading
+      async function loadFromURLParams() {
+        // Clear any previously loaded components (if this page is reused)
+        try { clearAll(); } catch (e) { /* noop */ }
+        const proteinUrl = getParam('protein');
+        const ligandUrl = getParam('ligand');
+        const moleculesData = getParam('molecules_data');
+        const pdbCode = getParam('pdb_code');
+        
+        if (proteinUrl) await loadFromFile(proteinUrl, 'Protein');
+        if (ligandUrl) await loadFromFile(ligandUrl, 'Ligand');
+        if (moleculesData) await loadFromData(moleculesData, 'Molecules');
+        if (pdbCode) await loadPDBCode(pdbCode);
+      }
+
+      function clearAll() {
+        try {
+          if (stage) {
+            if (typeof stage.removeAllComponents === 'function') {
+              stage.removeAllComponents();
+            } else {
+              // Fallback: remove components one by one
+              (loadedComponents || []).forEach(item => {
+                try { stage.removeComponent(item.component); } catch (e) { /* ignore */ }
+              });
+            }
+          }
+        } catch (e) { /* ignore */ }
+        loadedComponents = [];
+        representations = {};
+        entityEntries = [];
+        updateStructuresList();
+        updateAtomCount();
+      }
+      
+      // File loading functions
+      function isPdbqtUrl(u) {
+        try {
+          const s = (u || '').toLowerCase();
+          return s.endsWith('.pdbqt') || s.includes('.pdbqt?') || s.includes('.pdbqt%3f');
+        } catch (e) { return false; }
+      }
+
+      function guessElement(atomName, adType) {
+        const periodic = new Set(['H','He','Li','Be','B','C','N','O','F','Ne','Na','Mg','Al','Si','P','S','Cl','Ar','K','Ca','Sc','Ti','V','Cr','Mn','Fe','Co','Ni','Cu','Zn','Ga','Ge','As','Se','Br','Kr','Rb','Sr','Y','Zr','Nb','Mo','Tc','Ru','Rh','Pd','Ag','Cd','In','Sn','Sb','Te','I','Xe','Cs','Ba','La','Ce','Pr','Nd','Sm','Eu','Gd','Tb','Dy','Ho','Er','Tm','Yb','Lu','Hf','Ta','W','Re','Os','Ir','Pt','Au','Hg','Tl','Pb','Bi','Po','At','Rn']);
+        const an = (atomName || '').trim();
+        let candidate = '';
+        if (an.length >= 2 && /[A-Za-z]/.test(an[0]) && /[a-z]/.test(an[1])) candidate = an.slice(0,2).replace(/^./, c=>c.toUpperCase());
+        else if (an.length >= 1) candidate = an[0].toUpperCase();
+        if (periodic.has(candidate)) return candidate;
+        const t = (adType || '').replace(/[+-]/g,'').toLowerCase();
+        const map = { a:'C', c:'C', o:'O', oa:'O', h:'H', hd:'H', n:'N', na:'N', s:'S', sa:'S', p:'P', f:'F', cl:'Cl', br:'Br', i:'I', zn:'Zn', mg:'Mg', fe:'Fe', ca:'Ca' };
+        return map[t] || (candidate || 'C');
+      }
+
+      function pdbqtToPdb(pdbqtText) {
+        if (!pdbqtText) return '';
+        const lines = pdbqtText.split(/\r?\n/);
+        const atoms = [];
+        for (const line of lines) {
+          if (!line) continue;
+          if (line.startsWith('ATOM') || line.startsWith('HETATM')) atoms.push(line);
+        }
+        if (atoms.length === 0) return '';
+        let serial = 1;
+        const out = [];
+        const chainId = 'A';
+        for (const raw of atoms) {
+          const tok = raw.trim().split(/\s+/);
+          if (tok.length < 8) continue;
+          const atomName = tok[2] || 'C';
+          const resname = (tok[3] || 'LIG').slice(0,3);
+          // residue number (best effort)
+          let resnum = 1; let resIdx = 4;
+          try { resnum = Math.max(1, Math.trunc(parseFloat(tok[resIdx]))); }
+          catch(e){ try { resnum = Math.max(1, Math.trunc(parseFloat(tok[resIdx+1]))); resIdx += 1; } catch(e2){ resnum = 1; } }
+          // find xyz triple
+          let xyzIdx = null;
+          for (let i = Math.max(resIdx+1,5); i <= tok.length-3; i++) {
+            const a = tok[i], b = tok[i+1], c = tok[i+2];
+            if (!isNaN(parseFloat(a)) && !isNaN(parseFloat(b)) && !isNaN(parseFloat(c))) { xyzIdx = i; break; }
+          }
+          if (xyzIdx == null) xyzIdx = tok.length >= 8 ? 5 : null;
+          if (xyzIdx == null) continue;
+          let x = parseFloat(tok[xyzIdx]), y = parseFloat(tok[xyzIdx+1]), z = parseFloat(tok[xyzIdx+2]);
+          if (!isFinite(x) || !isFinite(y) || !isFinite(z)) continue;
+          const adType = tok[tok.length-1] || '';
+          const element = guessElement(atomName, adType);
+          const record = raw.startsWith('ATOM') ? 'ATOM  ' : 'HETATM';
+          const pdbLine = (
+            record + String(serial).padStart(5, ' ') + ' ' +
+            (atomName + '    ').slice(0,4).padEnd(4, ' ') +
+            ' ' + resname.padStart(3, ' ') + ' ' + chainId + String(resnum).padStart(4,' ') + '    ' +
+            x.toFixed(3).toString().padStart(8,' ') +
+            y.toFixed(3).toString().padStart(8,' ') +
+            z.toFixed(3).toString().padStart(8,' ') +
+            '  1.00  0.00          ' + element.padStart(2,' ')
+          );
+          out.push(pdbLine);
+          serial += 1;
+        }
+        out.push('TER');
+        out.push('END');
+        return out.join('\n') + '\n';
+      }
+
+      async function loadFromFile(url, name = 'Structure') {
+        if (!url) return null;
+        try {
+          const decoded = decodeURIComponent(url);
+          console.log(`Loading ${name} from file:`, decoded);
+          showLoading();
+          if (isPdbqtUrl(decoded)) {
+            // Fetch and convert PDBQT to PDB on-the-fly
+            const resp = await fetch(decoded);
+            if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+            const text = await resp.text();
+            const pdbText = pdbqtToPdb(text);
+            if (!pdbText) throw new Error('Empty or invalid PDBQT content');
+            const blob = new Blob([pdbText], { type: 'text/plain' });
+            const comp = await stage.loadFile(blob, { ext: 'pdb', name });
+            console.log(`Successfully loaded ${name} (converted from PDBQT):`, comp);
+            addComponent(comp, name);
+            return comp;
+          } else {
+            const comp = await stage.loadFile(decoded);
+            console.log(`Successfully loaded ${name}:`, comp);
+            addComponent(comp, name);
+            return comp;
+          }
+        } catch (error) {
+          console.error(`Failed to load ${name}:`, error);
+          showError(`Failed to load ${name}: ${error.message}`);
+          return null;
+        }
+      }
+      
+      async function loadPDBCode(pdbCode) {
+        if (!pdbCode) return null;
+        try {
+          console.log('Loading PDB code:', pdbCode);
+          showLoading();
+          const url = `https://files.rcsb.org/download/${pdbCode.toUpperCase()}.pdb`;
+          const comp = await stage.loadFile(url, { ext: 'pdb' });
+          console.log('Successfully loaded PDB:', comp);
+          addComponent(comp, `PDB: ${pdbCode.toUpperCase()}`);
+          return comp;
+        } catch (error) {
+          console.error(`Failed to load PDB ${pdbCode}:`, error);
+          showError(`Failed to load PDB ${pdbCode}: ${error.message}`);
+          return null;
+        }
+      }
+      
+      async function loadFromData(encodedData, name = 'Molecules') {
+        if (!encodedData) return null;
+        try {
+          console.log(`Loading ${name} from inline data...`);
+          showLoading();
+          const pdbData = atob(decodeURIComponent(encodedData));
+          const blob = new Blob([pdbData], { type: 'text/plain' });
+          const comp = await stage.loadFile(blob, { ext: 'pdb', name: name });
+          console.log(`Successfully loaded ${name}:`, comp);
+          addComponent(comp, name);
+          return comp;
+        } catch (error) {
+          console.error(`Failed to load ${name}:`, error);
+          showError(`Failed to load ${name}: ${error.message}`);
+          return null;
+        }
+      }
+      
+      // Component management
+      function addComponent(comp, name) {
+        loadedComponents.push({ component: comp, name: name, visible: true });
+        // Build detailed entities and representations
+        try {
+          addDetailedRepresentations(comp);
+        } catch (e) {
+          console.warn('Detailed representation failed, using defaults:', e);
+          addDefaultRepresentations(comp);
+        }
+        updateStructuresList();
+        stage.autoView();
+        showLoading(false);
+        // Wait for structure to be fully loaded before updating info
+        setTimeout(() => {
+          updateStructureInfo(comp);
+          updateAtomCount();
+        }, 100);
+      }
+      
+      function addDefaultRepresentations(comp) {
+        comp.removeAllRepresentations();
+        const structure = comp.structure || {};
+        const atomCount = structure.atomCount || 0;
+        const residueCount = (structure.residueCount || (structure.residueStore ? structure.residueStore.count : 0)) || 0;
+        const bondCount = (structure.bondStore && typeof structure.bondStore.count === 'number') ? structure.bondStore.count : 0;
+        const looksLikeProtein = residueCount > 150 || atomCount > 500;
+        if (looksLikeProtein) {
+          comp.addRepresentation('cartoon', { colorScheme: 'sstruc', quality: 'medium' });
+          const c1 = document.getElementById('show-cartoon'); if (c1) c1.checked = true;
+          const c2 = document.getElementById('show-licorice'); if (c2) c2.checked = false;
+          const c3 = document.getElementById('show-ball-stick'); if (c3) c3.checked = false;
+          const c4 = document.getElementById('show-spacefill'); if (c4) c4.checked = false;
+        } else {
+          if (bondCount > 0) {
+            comp.addRepresentation('licorice', { colorScheme: 'element' });
+            const c5 = document.getElementById('show-licorice'); if (c5) c5.checked = true;
+            const c6 = document.getElementById('show-spacefill'); if (c6) c6.checked = false;
+          } else {
+            // If no bonds available (common for converted PDBQT), show as spacefill
+            comp.addRepresentation('spacefill', { colorScheme: 'element', scale: 0.9 });
+            const c7 = document.getElementById('show-licorice'); if (c7) c7.checked = false;
+            const c8 = document.getElementById('show-spacefill'); if (c8) c8.checked = true;
+          }
+          const c9 = document.getElementById('show-cartoon'); if (c9) c9.checked = false;
+          const c10 = document.getElementById('show-ball-stick'); if (c10) c10.checked = false;
+        }
+      }
+
+      // Build detailed entities similar to RCSB/Chimera categorization
+      function addDetailedRepresentations(comp) {
+        const structure = comp.structure;
+        if (!structure || !structure.eachChain) {
+          addDefaultRepresentations(comp);
+          return;
+        }
+        comp.removeAllRepresentations();
+        
+        function buildSele(parts) {
+          // parts: array of strings, ignore falsy entries and join with ' and '
+          return parts.filter(Boolean).join(' and ');
+        }
+        // Known residue categories
+        const AA = new Set(['ALA','ARG','ASN','ASP','CYS','GLN','GLU','GLY','HIS','ILE','LEU','LYS','MET','PHE','PRO','SER','THR','TRP','TYR','VAL','SEC','PYL']);
+        const NA = new Set(['A','U','G','C','T','DA','DT','DG','DC','DU','RA','RU','RG','RC','RT']);
+        const WAT = new Set(['HOH','WAT','H2O']);
+        const ION = new Set(['NA','K','CL','MG','MN','ZN','CA','FE','FE2','FE3','CO','CU','NI','CD','AL','SR','BA','YB','LI']);
+
+        const proteinChains = [];
+        const nucleicChains = [];
+        const ligandChains = new Set();
+
+        // First pass: determine chain types and collect ligand residues
+        try {
+          structure.eachChain(chain => {
+            const cid = chain.chainname || chain.chainid || '';
+            let hasAA = false, hasNA = false, hasLig = false;
+            if (chain.eachResidue) {
+              chain.eachResidue(res => {
+                const rn = (res.resname || '').toUpperCase();
+                const rno = (res.resno != null ? res.resno : (res.resno || res.resid || res.index || 0));
+                if (AA.has(rn)) { hasAA = true; return; }
+                if (NA.has(rn)) { hasNA = true; return; }
+                if (WAT.has(rn)) { return; }
+                if (ION.has(rn)) { return; }
+                // Everything else that is not water/ion and not AA/NA is considered ligand/cofactor (mark chain)
+                if (rn && rn !== 'UNK') { hasLig = true; }
+              });
+            }
+            if (hasAA) proteinChains.push(cid);
+            else if (hasNA) nucleicChains.push(cid);
+            // Ligand presence per chain
+            if (hasLig) ligandChains.add(cid);
+          });
+        } catch (e) {
+          console.warn('Chain analysis failed:', e);
+        }
+
+        // Build representations per entity and register entries
+        const localEntries = [];
+
+        // Proteins by chain
+        for (const cid of proteinChains) {
+          const sele = `polymer and :${cid}`;
+          const rep = comp.addRepresentation('cartoon', { sele, colorScheme: 'chainname', quality: 'medium' });
+          localEntries.push({ component: comp, category: 'Protein', name: `Chain ${cid}`, sele, reps: { main: rep }, visible: true });
+        }
+
+        // Nucleic acids by chain
+        for (const cid of nucleicChains) {
+          const sele = `nucleic and :${cid}`;
+          const rep = comp.addRepresentation('cartoon', { sele, colorScheme: 'chainname', quality: 'medium' });
+          localEntries.push({ component: comp, category: 'Nucleic', name: `Chain ${cid}`, sele, reps: { main: rep }, visible: true });
+        }
+
+        // Ligands per chain (Biovia-like simplification)
+        for (const cid of Array.from(ligandChains)) {
+          let sele = buildSele([`ligand`, `:${cid}`]);
+          try {
+            const test = comp.addRepresentation('ball+stick', { sele, visible: false });
+            comp.removeRepresentation(test);
+          } catch (e) {
+            sele = buildSele([`hetero`, `:${cid}`, `not water`, `not ion`]);
+          }
+          const rep = comp.addRepresentation('licorice', { sele, colorScheme: 'element' });
+          localEntries.push({ component: comp, category: 'Ligand', name: `Ligand ${cid}`, sele, reps: { main: rep }, visible: true });
+        }
+
+        // Global Ions and Water (hidden by default)
+        try {
+          const repIon = comp.addRepresentation('spacefill', { sele: 'ion', colorScheme: 'element', scale: 0.6, opacity: 0.9 });
+          if (repIon && typeof repIon.setVisibility === 'function') repIon.setVisibility(false);
+          localEntries.push({ component: comp, category: 'Ion', name: 'Ions', sele: 'ion', reps: { main: repIon }, visible: false });
+        } catch (e) { /* ignore */ }
+        try {
+          const repWat = comp.addRepresentation('point', { sele: 'water', pointSize: 0.2, color: 'skyblue' });
+          if (repWat && typeof repWat.setVisibility === 'function') repWat.setVisibility(false);
+          localEntries.push({ component: comp, category: 'Water', name: 'Water', sele: 'water', reps: { main: repWat }, visible: false });
+        } catch (e) { /* ignore */ }
+
+        // If nothing recognized, fallback default
+        if (localEntries.length === 0) {
+          addDefaultRepresentations(comp);
+        }
+
+        // Merge into global entries for UI
+        entityEntries.push(...localEntries);
+        // Toggle default checkboxes to reflect content
+        try {
+          if (proteinChains.length + nucleicChains.length > 0) {
+            const el = document.getElementById('show-cartoon'); if (el) el.checked = true;
+          }
+          if (ligandChains.size > 0) {
+            const el2 = document.getElementById('show-licorice'); if (el2) el2.checked = true;
+          }
+        } catch (e) { /* noop */ }
+      }
+      
+      // UI Functions
+      function togglePanel(header) {
+        const content = header.nextElementSibling;
+        const isCollapsed = content.classList.contains('collapsed');
+        
+        if (isCollapsed) {
+          content.classList.remove('collapsed');
+          header.classList.remove('collapsed');
+        } else {
+          content.classList.add('collapsed');
+          header.classList.add('collapsed');
+        }
+      }
+      
+      function toggleControlPanel() {
+        const panel = document.getElementById('control-panel');
+        const toggle = document.querySelector('.toggle-panel');
+        const isHidden = panel.classList.contains('hidden');
+        
+        if (isHidden) {
+          panel.classList.remove('hidden');
+          toggle.innerHTML = '‹';
+        } else {
+          panel.classList.add('hidden');
+          toggle.innerHTML = '›';
+        }
+      }
+      
+      // Representation functions
+      function applyPreset(preset) {
+        if (entityEntries && entityEntries.length > 0) {
+          // In per-entity mode, ignore global preset to preserve detailed grouping
+          console.log('Per-entity mode active; preset ignored');
+          return;
+        }
+        // Clear all checkboxes first
+        document.getElementById('show-cartoon').checked = false;
+        document.getElementById('show-surface').checked = false;
+        document.getElementById('show-licorice').checked = false;
+        document.getElementById('show-ball-stick').checked = false;
+        document.getElementById('show-spacefill').checked = false;
+        
+        loadedComponents.forEach(({ component }) => {
+          component.removeAllRepresentations();
+          
+          switch (preset) {
+            case 'cartoon':
+              component.addRepresentation('cartoon', { 
+                colorScheme: document.getElementById('color-scheme').value,
+                quality: document.getElementById('cartoon-quality').value
+              });
+              document.getElementById('show-cartoon').checked = true;
+              break;
+            case 'surface':
+              component.addRepresentation('surface', { 
+                opacity: parseFloat(document.getElementById('surface-opacity').value),
+                colorScheme: document.getElementById('color-scheme').value
+              });
+              document.getElementById('show-surface').checked = true;
+              break;
+            case 'licorice':
+              component.addRepresentation('licorice', { 
+                colorScheme: document.getElementById('color-scheme').value
+              });
+              document.getElementById('show-licorice').checked = true;
+              break;
+            case 'spacefill':
+              component.addRepresentation('spacefill', { 
+                colorScheme: document.getElementById('color-scheme').value
+              });
+              document.getElementById('show-spacefill').checked = true;
+              break;
+          }
+        });
+      }
+      
+      function updateRepresentations() {
+        if (entityEntries && entityEntries.length > 0) {
+          // In per-entity mode, skip destructive global updates
+          console.log('Per-entity mode active; representation toggles disabled');
+          return;
+        }
+        const colorScheme = document.getElementById('color-scheme').value;
+        const quality = document.getElementById('cartoon-quality').value;
+        const opacity = parseFloat(document.getElementById('surface-opacity').value);
+        
+        loadedComponents.forEach(({ component }) => {
+          component.removeAllRepresentations();
+          
+          if (document.getElementById('show-cartoon').checked) {
+            component.addRepresentation('cartoon', { colorScheme, quality });
+          }
+          if (document.getElementById('show-surface').checked) {
+            component.addRepresentation('surface', { colorScheme, opacity });
+          }
+          if (document.getElementById('show-licorice').checked) {
+            component.addRepresentation('licorice', { colorScheme });
+          }
+          if (document.getElementById('show-ball-stick').checked) {
+            component.addRepresentation('ball+stick', { colorScheme });
+          }
+          if (document.getElementById('show-spacefill').checked) {
+            component.addRepresentation('spacefill', { colorScheme });
+          }
+        });
+      }
+      
+      // Visual settings
+      function updateBackground() {
+        const color = document.getElementById('bg-color').value;
+        document.getElementById('bg-color-text').value = color;
+        if (stage) {
+          stage.setBackground(color);
+        }
+      }
+      
+      function updateBackgroundFromText() {
+        const color = document.getElementById('bg-color-text').value;
+        document.getElementById('bg-color').value = color;
+        if (stage) {
+          stage.setBackground(color);
+        }
+      }
+      
+      function updateSurfaceOpacity() {
+        const opacity = parseFloat(document.getElementById('surface-opacity').value);
+        document.getElementById('surface-opacity-value').textContent = opacity.toFixed(1);
+        updateRepresentations();
+      }
+      
+      // Animation functions
+      function toggleSpin() {
+        const spin = document.getElementById('auto-spin').checked;
+        if (stage) {
+          stage.setSpin(spin);
+          if (spin) {
+            updateSpinSpeed();
+          }
+        }
+      }
+      
+      function updateSpinSpeed() {
+        const speed = parseFloat(document.getElementById('spin-speed').value);
+        document.getElementById('spin-speed-value').textContent = speed.toFixed(1);
+        if (stage && document.getElementById('auto-spin').checked) {
+          stage.spinAnimation.speed = speed;
+        }
+      }
+      
+      // Toolbar functions
+      function resetView() {
+        if (stage) {
+          stage.autoView(1000);
+        }
+      }
+      
+      function centerView() {
+        if (stage) {
+          stage.autoView(500);
+        }
+      }
+      
+      function fullscreen() {
+        if (document.fullscreenElement) {
+          document.exitFullscreen();
+        } else {
+          document.documentElement.requestFullscreen();
+        }
+      }
+      
+      // Structure list management
+      function updateStructuresList() {
+        const container = document.getElementById('structures-list');
+        if (!container) return;
+        if (loadedComponents.length === 0) {
+          container.innerHTML = '<p style="color: rgba(255,255,255,0.5); font-size: 11px; text-align: center; margin: 8px 0;">No structures loaded</p>';
+          return;
+        }
+
+        // Group entity entries by category
+        const groups = new Map();
+        for (const e of entityEntries) {
+          if (!groups.has(e.category)) groups.set(e.category, []);
+          groups.get(e.category).push(e);
+        }
+
+        const order = ['Protein', 'Ligand', 'Nucleic', 'Ion', 'Water'];
+        container.innerHTML = '';
+
+        // Render per-category sections
+        for (const cat of order) {
+          const list = groups.get(cat) || [];
+          if (list.length === 0) continue;
+          const header = document.createElement('div');
+          header.style = 'font-weight:600; margin: 6px 0 4px 0; color: rgba(255,255,255,0.85)';
+          header.textContent = cat + 's';
+          container.appendChild(header);
+          for (let i = 0; i < list.length; i++) {
+            const entry = list[i];
+            const div = document.createElement('div');
+            div.className = 'structure-item';
+            const vis = entry.visible;
+            const idx = entityEntries.indexOf(entry);
+            div.innerHTML = `
+              <div class="structure-name">${entry.name}</div>
+              <div class="structure-controls">
+                <button onclick="toggleEntityVisibility(${idx})" title="Toggle visibility">${vis ? '👁' : '👁‍🗨'}</button>
+                <button onclick="centerEntity(${idx})" title="Center/Zoom">📍</button>
+              </div>
+            `;
+            container.appendChild(div);
+          }
+        }
+      }
+
+      function toggleEntityVisibility(index) {
+        const e = entityEntries[index];
+        if (!e) return;
+        e.visible = !e.visible;
+        try { if (e.reps && e.reps.main && typeof e.reps.main.setVisibility === 'function') e.reps.main.setVisibility(e.visible); } catch (er) {}
+        try { if (e.reps && e.reps.label && typeof e.reps.label.setVisibility === 'function') e.reps.label.setVisibility(e.visible); } catch (er) {}
+        updateStructuresList();
+      }
+
+      function centerEntity(index) {
+        const e = entityEntries[index];
+        if (!e) return;
+        try { if (e.component && typeof e.component.autoView === 'function') e.component.autoView(e.sele); else stage.autoView(); }
+        catch (er) { try { stage.autoView(); } catch (e2) {} }
+      }
+      
+      function toggleStructureVisibility(index) {
+        if (index >= 0 && index < loadedComponents.length) {
+          const item = loadedComponents[index];
+          item.visible = !item.visible;
+          item.component.setVisibility(item.visible);
+          updateStructuresList();
+        }
+      }
+      
+      function removeStructure(index) {
+        if (index >= 0 && index < loadedComponents.length) {
+          const item = loadedComponents[index];
+          stage.removeComponent(item.component);
+          // Remove any entity entries belonging to this component
+          try { entityEntries = entityEntries.filter(e => e.component !== item.component); } catch (e) {}
+          loadedComponents.splice(index, 1);
+          updateStructuresList();
+          updateAtomCount();
+        }
+      }
+      
+      // Info panel management
+      function updateStructureInfo(component) {
+        const container = document.getElementById('info-content');
+        if (!component || !component.structure) {
+          container.innerHTML = '<p style="color: rgba(255,255,255,0.5); font-size: 11px; text-align: center; margin: 8px 0;">No structure information available</p>';
+          return;
+        }
+        
+        try {
+          const structure = component.structure;
+          const atomCount = structure.atomCount || 0;
+          const residueCount = structure.residueCount || 0;
+          const chainCount = structure.chainStore ? structure.chainStore.count : 0;
+          
+          container.innerHTML = `
+            <div class="info-card">
+              <h4>Structure Details</h4>
+              <p>Atoms: ${atomCount.toLocaleString()}</p>
+              <p>Residues: ${residueCount.toLocaleString()}</p>
+              <p>Chains: ${chainCount}</p>
+            </div>
+          `;
+          
+          // Add chain information if available
+          if (chainCount > 0 && structure.eachChain) {
+            const chainNames = [];
+            try {
+              structure.eachChain(cp => {
+                if (cp.chainname && !chainNames.includes(cp.chainname)) {
+                  chainNames.push(cp.chainname);
+                }
+              });
+              
+              if (chainNames.length > 0) {
+                const chainDiv = document.createElement('div');
+                chainDiv.className = 'info-card';
+                chainDiv.innerHTML = `
+                  <h4>Chains</h4>
+                  <p>${chainNames.slice(0, 10).join(', ')}${chainNames.length > 10 ? '...' : ''}</p>
+                `;
+                container.appendChild(chainDiv);
+              }
+            } catch (e) {
+              console.warn('Error reading chain information:', e);
+            }
+          }
+        } catch (error) {
+          console.error('Error updating structure info:', error);
+          container.innerHTML = '<p style="color: rgba(255,255,255,0.5); font-size: 11px; text-align: center; margin: 8px 0;">Error loading structure information</p>';
+        }
+      }
+      
+      function updateAtomCount() {
+        try {
+          let totalAtoms = 0;
+          loadedComponents.forEach(item => {
+            if (item.component && item.component.structure && item.component.structure.atomCount) {
+              totalAtoms += item.component.structure.atomCount;
+            }
+          });
+          const countElement = document.getElementById('atom-count');
+          if (countElement) {
+            countElement.textContent = totalAtoms > 0 ? totalAtoms.toLocaleString() : '--';
+          }
+        } catch (error) {
+          console.error('Error updating atom count:', error);
+          const countElement = document.getElementById('atom-count');
+          if (countElement) {
+            countElement.textContent = '--';
+          }
+        }
+      }
+      
+      // Initialize UI values from URL parameters
+      function initializeUIFromParams() {
+        const bg = getParam('bg');
+        if (bg) {
+          document.getElementById('bg-color').value = bg;
+          document.getElementById('bg-color-text').value = bg;
+        }
+        
+        const spin = getParam('spin');
+        if (spin === '1') {
+          document.getElementById('auto-spin').checked = true;
+          setTimeout(() => {
+            if (stage) {
+              stage.setSpin(true);
+            }
+          }, 1000);
+        }
+        
+        const repr = getParam('repr');
+        if (repr) {
+          setTimeout(() => {
+            if (repr.includes('cartoon')) {
+              document.getElementById('show-cartoon').checked = true;
+            }
+            if (repr.includes('surface')) {
+              document.getElementById('show-surface').checked = true;
+            }
+            if (repr.includes('licorice')) {
+              document.getElementById('show-licorice').checked = true;
+            }
+            if (repr.includes('ball+stick')) {
+              document.getElementById('show-ball-stick').checked = true;
+            }
+            if (repr.includes('spacefill')) {
+              document.getElementById('show-spacefill').checked = true;
+            }
+          }, 500);
+        }
+      }
+      
+    </script>
+  </body>
+</html>

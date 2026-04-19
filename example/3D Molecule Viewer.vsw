@@ -1,0 +1,98 @@
+{
+  "nodes": [
+    {
+      "id": "node_2310535738176",
+      "type": "web3d_viewer",
+      "title": "3D Web Viewer",
+      "properties": {
+        "protein_pdb": "",
+        "molecules_data": "",
+        "pdb_code": "",
+        "background": "#0e0e0e",
+        "spin": true,
+        "representation": "cartoon+licorice"
+      },
+      "position": {
+        "x": -226.0,
+        "y": -160.0
+      },
+      "size": {
+        "w": 520.0,
+        "h": 360.0
+      },
+      "inputs": [
+        "molecules"
+      ],
+      "outputs": [
+        "viewer_url"
+      ]
+    },
+    {
+      "id": "node_2310535948352",
+      "type": "mol_reader_auto",
+      "title": "Molecule Reader (Auto)",
+      "properties": {
+        "file_paths": ""
+      },
+      "position": {
+        "x": -545.0,
+        "y": -159.0
+      },
+      "size": {
+        "w": 200.0,
+        "h": 100.0
+      },
+      "inputs": [
+        "files",
+        "file"
+      ],
+      "outputs": [
+        "molecules"
+      ]
+    },
+    {
+      "id": "node_2310434263424",
+      "type": "file_input",
+      "title": "File Input",
+      "properties": {
+        "file_paths": ""
+      },
+      "position": {
+        "x": -975.0,
+        "y": -198.0
+      },
+      "size": {
+        "w": 260.0,
+        "h": 120.0
+      },
+      "inputs": [],
+      "outputs": [
+        "files",
+        "file",
+        "file_paths"
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "conn_2310434749248",
+      "source_node": "node_2310535948352",
+      "source_port": "molecules",
+      "target_node": "node_2310535738176",
+      "target_port": "molecules",
+      "label": "molecules"
+    },
+    {
+      "id": "conn_2310434836864",
+      "source_node": "node_2310434263424",
+      "source_port": "file",
+      "target_node": "node_2310535948352",
+      "target_port": "file",
+      "label": "file"
+    }
+  ],
+  "metadata": {
+    "version": "1.0",
+    "created_with": "Vera"
+  }
+}

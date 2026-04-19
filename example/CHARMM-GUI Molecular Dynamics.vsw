@@ -1,0 +1,505 @@
+{
+  "nodes": [
+    {
+      "id": "node_2308649185152",
+      "type": "charmm_gui_input",
+      "title": "CHARMM-GUI Input",
+      "properties": {
+        "needs_confirmation": false,
+        "auto_detect": true,
+        "user_checked_keys": [],
+        "user_selected_files": {}
+      },
+      "position": {
+        "x": -497.2311704484736,
+        "y": -249.332056651396
+      },
+      "size": {
+        "w": 420.0,
+        "h": 240.0
+      },
+      "inputs": [
+        "folder"
+      ],
+      "outputs": [
+        "gro_file",
+        "top_file",
+        "mdp_min",
+        "mdp_eq",
+        "mdp_prod",
+        "index_file",
+        "folder_path"
+      ]
+    },
+    {
+      "id": "node_2308661386816",
+      "type": "folder_input",
+      "title": "Folder Input",
+      "properties": {
+        "folder_path": ""
+      },
+      "position": {
+        "x": -816.0,
+        "y": -238.0
+      },
+      "size": {
+        "w": 260.0,
+        "h": 120.0
+      },
+      "inputs": [],
+      "outputs": [
+        "folder"
+      ]
+    },
+    {
+      "id": "node_2308661438016",
+      "type": "gromacs_minimize",
+      "title": "GROMACS Minimization",
+      "properties": {
+        "gromacs_version": "2025.1",
+        "use_gpu": true,
+        "maxwarn": 1
+      },
+      "position": {
+        "x": 274.0,
+        "y": -302.0
+      },
+      "size": {
+        "w": 200.0,
+        "h": 100.0
+      },
+      "inputs": [
+        "gro_file",
+        "top_file",
+        "mdp_file",
+        "index_file"
+      ],
+      "outputs": [
+        "gro_file",
+        "log_file",
+        "tpr_file",
+        "edr_file"
+      ]
+    },
+    {
+      "id": "node_2308661440320",
+      "type": "gromacs_equilibrate",
+      "title": "GROMACS Equilibration",
+      "properties": {
+        "gromacs_version": "2025.1",
+        "use_gpu": true,
+        "maxwarn": 1
+      },
+      "position": {
+        "x": 278.0,
+        "y": -94.0
+      },
+      "size": {
+        "w": 200.0,
+        "h": 100.0
+      },
+      "inputs": [
+        "gro_file",
+        "gro_ref",
+        "top_file",
+        "mdp_file",
+        "index_file"
+      ],
+      "outputs": [
+        "gro_file",
+        "log_file",
+        "tpr_file",
+        "edr_file"
+      ]
+    },
+    {
+      "id": "node_2308661510976",
+      "type": "gromacs_production",
+      "title": "GROMACS Production",
+      "properties": {
+        "gromacs_version": "2025.1",
+        "use_gpu": true,
+        "nsteps": 250000,
+        "nstlist": 300,
+        "continuation": false
+      },
+      "position": {
+        "x": 277.0,
+        "y": 142.0
+      },
+      "size": {
+        "w": 200.0,
+        "h": 100.0
+      },
+      "inputs": [
+        "gro_file",
+        "top_file",
+        "mdp_file",
+        "index_file",
+        "cpt_file"
+      ],
+      "outputs": [
+        "gro_file",
+        "xtc_file",
+        "tpr_file",
+        "edr_file",
+        "log_file",
+        "cpt_file"
+      ]
+    },
+    {
+      "id": "node_2308661587712",
+      "type": "xtc_extractor",
+      "title": "XTC Extractor",
+      "properties": {
+        "pbc_method": "mol",
+        "ur_method": "compact",
+        "center": false,
+        "fit": false,
+        "gromacs_version": "2025.1",
+        "use_gpu": false
+      },
+      "position": {
+        "x": 690.0,
+        "y": 99.0
+      },
+      "size": {
+        "w": 200.0,
+        "h": 100.0
+      },
+      "inputs": [
+        "tpr_file",
+        "xtc_file"
+      ],
+      "outputs": [
+        "xtc_file",
+        "tpr_file"
+      ]
+    },
+    {
+      "id": "node_2308649301952",
+      "type": "gromacs_viewer",
+      "title": "GROMACS Viewer",
+      "properties": {},
+      "position": {
+        "x": 678.0,
+        "y": -343.0
+      },
+      "size": {
+        "w": 520.0,
+        "h": 360.0
+      },
+      "inputs": [
+        "gro_file",
+        "xtc_file"
+      ],
+      "outputs": []
+    },
+    {
+      "id": "node_2308649175104",
+      "type": "gromacs_analysis",
+      "title": "GROMACS Analysis",
+      "properties": {
+        "do_rmsd": true,
+        "do_rmsd_protein_ligand": true,
+        "do_rmsf": true,
+        "do_rmsf_residue": true,
+        "do_gyration": true,
+        "do_sasa": true,
+        "do_hbond": true,
+        "do_energy": true,
+        "gromacs_version": "2025.1",
+        "use_gpu": false
+      },
+      "position": {
+        "x": 1109.0,
+        "y": 94.0
+      },
+      "size": {
+        "w": 200.0,
+        "h": 216.0
+      },
+      "inputs": [
+        "tpr_file",
+        "xtc_file",
+        "edr_file"
+      ],
+      "outputs": [
+        "analysis_folder",
+        "rmsd",
+        "rmsd_protein_ligand",
+        "rmsf_atom",
+        "rmsf_residue",
+        "radius_of_gyration",
+        "sasa",
+        "hydrogen_bonds",
+        "potential_energy"
+      ]
+    },
+    {
+      "id": "node_2308649300928",
+      "type": "gromacs_ploting",
+      "title": "GROMACS Plotting",
+      "properties": {
+        "plot_color": "#4169e1"
+      },
+      "position": {
+        "x": 1540.0,
+        "y": 47.0
+      },
+      "size": {
+        "w": 588.0,
+        "h": 520.0
+      },
+      "inputs": [
+        "rmsd",
+        "rmsd_protein_ligand",
+        "rmsf_atom",
+        "rmsf_residue",
+        "radius_of_gyration",
+        "sasa",
+        "hydrogen_bonds",
+        "potential_energy"
+      ],
+      "outputs": []
+    }
+  ],
+  "connections": [
+    {
+      "id": "conn_2308661522048",
+      "source_node": "node_2308661386816",
+      "source_port": "folder",
+      "target_node": "node_2308649185152",
+      "target_port": "folder",
+      "label": "string"
+    },
+    {
+      "id": "conn_2308661671424",
+      "source_node": "node_2308649185152",
+      "source_port": "gro_file",
+      "target_node": "node_2308661438016",
+      "target_port": "gro_file",
+      "label": "file"
+    },
+    {
+      "id": "conn_2308661392448",
+      "source_node": "node_2308649185152",
+      "source_port": "top_file",
+      "target_node": "node_2308661438016",
+      "target_port": "top_file",
+      "label": "file"
+    },
+    {
+      "id": "conn_2308661669312",
+      "source_node": "node_2308649185152",
+      "source_port": "mdp_min",
+      "target_node": "node_2308661438016",
+      "target_port": "mdp_file",
+      "label": "file"
+    },
+    {
+      "id": "conn_2308661671488",
+      "source_node": "node_2308649185152",
+      "source_port": "index_file",
+      "target_node": "node_2308661438016",
+      "target_port": "index_file",
+      "label": "file"
+    },
+    {
+      "id": "conn_2308661670656",
+      "source_node": "node_2308661438016",
+      "source_port": "gro_file",
+      "target_node": "node_2308661440320",
+      "target_port": "gro_file",
+      "label": "file"
+    },
+    {
+      "id": "conn_2308661673088",
+      "source_node": "node_2308649185152",
+      "source_port": "gro_file",
+      "target_node": "node_2308661440320",
+      "target_port": "gro_ref",
+      "label": "file"
+    },
+    {
+      "id": "conn_2308661668288",
+      "source_node": "node_2308649185152",
+      "source_port": "top_file",
+      "target_node": "node_2308661440320",
+      "target_port": "top_file",
+      "label": "file"
+    },
+    {
+      "id": "conn_2308661673280",
+      "source_node": "node_2308649185152",
+      "source_port": "mdp_eq",
+      "target_node": "node_2308661440320",
+      "target_port": "mdp_file",
+      "label": "file"
+    },
+    {
+      "id": "conn_2308661669632",
+      "source_node": "node_2308649185152",
+      "source_port": "index_file",
+      "target_node": "node_2308661440320",
+      "target_port": "index_file",
+      "label": "file"
+    },
+    {
+      "id": "conn_2308661668416",
+      "source_node": "node_2308661440320",
+      "source_port": "gro_file",
+      "target_node": "node_2308661510976",
+      "target_port": "gro_file",
+      "label": "file"
+    },
+    {
+      "id": "conn_2308661670080",
+      "source_node": "node_2308649185152",
+      "source_port": "top_file",
+      "target_node": "node_2308661510976",
+      "target_port": "top_file",
+      "label": "file"
+    },
+    {
+      "id": "conn_2308661667584",
+      "source_node": "node_2308649185152",
+      "source_port": "mdp_prod",
+      "target_node": "node_2308661510976",
+      "target_port": "mdp_file",
+      "label": "file"
+    },
+    {
+      "id": "conn_2308661673792",
+      "source_node": "node_2308649185152",
+      "source_port": "index_file",
+      "target_node": "node_2308661510976",
+      "target_port": "index_file",
+      "label": "file"
+    },
+    {
+      "id": "conn_2308661673216",
+      "source_node": "node_2308661510976",
+      "source_port": "tpr_file",
+      "target_node": "node_2308661587712",
+      "target_port": "tpr_file",
+      "label": "file"
+    },
+    {
+      "id": "conn_2308661667008",
+      "source_node": "node_2308661510976",
+      "source_port": "xtc_file",
+      "target_node": "node_2308661587712",
+      "target_port": "xtc_file",
+      "label": "file"
+    },
+    {
+      "id": "conn_2308661670016",
+      "source_node": "node_2308661510976",
+      "source_port": "gro_file",
+      "target_node": "node_2308649301952",
+      "target_port": "gro_file",
+      "label": "file"
+    },
+    {
+      "id": "conn_2308661673472",
+      "source_node": "node_2308661510976",
+      "source_port": "xtc_file",
+      "target_node": "node_2308649301952",
+      "target_port": "xtc_file",
+      "label": "file"
+    },
+    {
+      "id": "conn_2308661667840",
+      "source_node": "node_2308661587712",
+      "source_port": "tpr_file",
+      "target_node": "node_2308649175104",
+      "target_port": "tpr_file",
+      "label": "file"
+    },
+    {
+      "id": "conn_2308661670912",
+      "source_node": "node_2308661587712",
+      "source_port": "xtc_file",
+      "target_node": "node_2308649175104",
+      "target_port": "xtc_file",
+      "label": "file"
+    },
+    {
+      "id": "conn_2308661668160",
+      "source_node": "node_2308661510976",
+      "source_port": "edr_file",
+      "target_node": "node_2308649175104",
+      "target_port": "edr_file",
+      "label": "file"
+    },
+    {
+      "id": "conn_2308661672640",
+      "source_node": "node_2308649175104",
+      "source_port": "rmsd",
+      "target_node": "node_2308649300928",
+      "target_port": "rmsd",
+      "label": "data"
+    },
+    {
+      "id": "conn_2308661666752",
+      "source_node": "node_2308649175104",
+      "source_port": "rmsd_protein_ligand",
+      "target_node": "node_2308649300928",
+      "target_port": "rmsd_protein_ligand",
+      "label": "data"
+    },
+    {
+      "id": "conn_2308661671104",
+      "source_node": "node_2308649175104",
+      "source_port": "rmsf_atom",
+      "target_node": "node_2308649300928",
+      "target_port": "rmsf_atom",
+      "label": "data"
+    },
+    {
+      "id": "conn_2308661670720",
+      "source_node": "node_2308649175104",
+      "source_port": "rmsf_residue",
+      "target_node": "node_2308649300928",
+      "target_port": "rmsf_residue",
+      "label": "data"
+    },
+    {
+      "id": "conn_2308661669504",
+      "source_node": "node_2308649175104",
+      "source_port": "radius_of_gyration",
+      "target_node": "node_2308649300928",
+      "target_port": "radius_of_gyration",
+      "label": "data"
+    },
+    {
+      "id": "conn_2308661667328",
+      "source_node": "node_2308649175104",
+      "source_port": "sasa",
+      "target_node": "node_2308649300928",
+      "target_port": "sasa",
+      "label": "data"
+    },
+    {
+      "id": "conn_2308661667520",
+      "source_node": "node_2308649175104",
+      "source_port": "hydrogen_bonds",
+      "target_node": "node_2308649300928",
+      "target_port": "hydrogen_bonds",
+      "label": "data"
+    },
+    {
+      "id": "conn_2308662432704",
+      "source_node": "node_2308649175104",
+      "source_port": "potential_energy",
+      "target_node": "node_2308649300928",
+      "target_port": "potential_energy",
+      "label": "data"
+    }
+  ],
+  "metadata": {
+    "version": "1.0",
+    "created_with": "Vera"
+  }
+}

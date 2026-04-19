@@ -1,0 +1,500 @@
+{
+  "nodes": [
+    {
+      "id": "node_2310434994688",
+      "type": "autodock_vina",
+      "title": "AutoDock Vina",
+      "properties": {
+        "center_x": 0.0,
+        "center_y": 0.0,
+        "center_z": 0.0,
+        "size_x": 20.0,
+        "size_y": 20.0,
+        "size_z": 20.0,
+        "exhaustiveness": 8,
+        "num_modes": 9,
+        "energy_range": 3.0,
+        "vina_version": "1.2.5"
+      },
+      "position": {
+        "x": -174.0,
+        "y": 94.0
+      },
+      "size": {
+        "w": 200.0,
+        "h": 100.0
+      },
+      "inputs": [
+        "receptor_molecules",
+        "ligand_molecules",
+        "grid_params"
+      ],
+      "outputs": [
+        "docking_results",
+        "docked_molecules",
+        "best_pose",
+        "docking_log"
+      ]
+    },
+    {
+      "id": "node_2310536610240",
+      "type": "grid_search",
+      "title": "Grid Box Search",
+      "properties": {
+        "padding": 5.0,
+        "pdb_code": "",
+        "selected_residue": "",
+        "mode": "ligand",
+        "min_size": 16.0,
+        "max_size": 60.0,
+        "override_center": false,
+        "center_x": 0.0,
+        "center_y": 0.0,
+        "center_z": 0.0,
+        "override_size": false,
+        "size_x": 20.0,
+        "size_y": 20.0,
+        "size_z": 20.0
+      },
+      "position": {
+        "x": -738.0,
+        "y": 318.0
+      },
+      "size": {
+        "w": 340.0,
+        "h": 180.0
+      },
+      "inputs": [],
+      "outputs": [
+        "grid_params"
+      ]
+    },
+    {
+      "id": "node_2308646331904",
+      "type": "file_input",
+      "title": "File Input",
+      "properties": {
+        "file_paths": ""
+      },
+      "position": {
+        "x": -1325.3320245919554,
+        "y": 126.3661258856252
+      },
+      "size": {
+        "w": 260.0,
+        "h": 120.0
+      },
+      "inputs": [],
+      "outputs": [
+        "files",
+        "file",
+        "file_paths"
+      ]
+    },
+    {
+      "id": "node_2308646249664",
+      "type": "rcsb_pdb",
+      "title": "RCSB PDB",
+      "properties": {
+        "pdb_code": ""
+      },
+      "position": {
+        "x": -1193.0,
+        "y": -167.0
+      },
+      "size": {
+        "w": 320.0,
+        "h": 140.0
+      },
+      "inputs": [],
+      "outputs": [
+        "molecules"
+      ]
+    },
+    {
+      "id": "node_2308645853504",
+      "type": "receptor_preparation",
+      "title": "Receptor Preparation",
+      "properties": {
+        "remove_waters": true,
+        "remove_ligands": true,
+        "keep_metals": true,
+        "keep_resnames": "",
+        "remove_nonstd_residues": false,
+        "add_hydrogens_mode": null,
+        "compute_charges": null,
+        "metal_elements": "ZN,MG,FE,MN,CU,CO,NI,CA,NA,K,CD,HG",
+        "unique_atom_names": false,
+        "name": "",
+        "description": ""
+      },
+      "position": {
+        "x": -690.0,
+        "y": -75.0
+      },
+      "size": {
+        "w": 200.0,
+        "h": 100.0
+      },
+      "inputs": [
+        "molecules"
+      ],
+      "outputs": [
+        "molecules"
+      ]
+    },
+    {
+      "id": "node_2308646452864",
+      "type": "mol_reader_auto",
+      "title": "Molecule Reader (Auto)",
+      "properties": {
+        "file_paths": ""
+      },
+      "position": {
+        "x": -933.9072029984412,
+        "y": 127.70812371575025
+      },
+      "size": {
+        "w": 200.0,
+        "h": 110.29187628424978
+      },
+      "inputs": [
+        "files",
+        "file"
+      ],
+      "outputs": [
+        "molecules"
+      ]
+    },
+    {
+      "id": "node_2310012992640",
+      "type": "docking_analysis",
+      "title": "Docking Analysis",
+      "properties": {
+        "analysis_mode": "best_per_ligand",
+        "top_k": 1,
+        "affinity_threshold": -7.0,
+        "ligand_filter": "",
+        "sort_by": "affinity",
+        "sort_desc": false,
+        "preview_source": "analysis",
+        "auto_refresh_preview": true
+      },
+      "position": {
+        "x": 179.21177635556842,
+        "y": -344.3703610664163
+      },
+      "size": {
+        "w": 560.0,
+        "h": 300.0
+      },
+      "inputs": [
+        "docking_results",
+        "molecules"
+      ],
+      "outputs": [
+        "analysis_dataframe",
+        "molecules",
+        "best_pose"
+      ]
+    },
+    {
+      "id": "node_2310536567872",
+      "type": "text_view",
+      "title": "Text View",
+      "properties": {},
+      "position": {
+        "x": 188.0,
+        "y": 181.0
+      },
+      "size": {
+        "w": 360.0,
+        "h": 220.0
+      },
+      "inputs": [
+        "string",
+        "data"
+      ],
+      "outputs": []
+    },
+    {
+      "id": "node_2308648375488",
+      "type": "table_view",
+      "title": "Table View",
+      "properties": {},
+      "position": {
+        "x": 1037.0,
+        "y": -503.0
+      },
+      "size": {
+        "w": 360.0,
+        "h": 220.0
+      },
+      "inputs": [
+        "data"
+      ],
+      "outputs": []
+    },
+    {
+      "id": "node_2310536317248",
+      "type": "save_dataframe",
+      "title": "Save DataFrame",
+      "properties": {
+        "output_path": "",
+        "file_type": "auto",
+        "overwrite": true,
+        "include_index": false
+      },
+      "position": {
+        "x": 1048.0,
+        "y": -703.0
+      },
+      "size": {
+        "w": 320.0,
+        "h": 140.0
+      },
+      "inputs": [
+        "data"
+      ],
+      "outputs": [
+        "saved_file"
+      ]
+    },
+    {
+      "id": "node_2308648667776",
+      "type": "vina_split",
+      "title": "Vina Split",
+      "properties": {
+        "start_index_1based": 1,
+        "num_outputs": 3
+      },
+      "position": {
+        "x": 972.9059872001153,
+        "y": 171.06457191096342
+      },
+      "size": {
+        "w": 200.0,
+        "h": 139.22649680002888
+      },
+      "inputs": [
+        "molecules"
+      ],
+      "outputs": [
+        "molecule_1",
+        "molecule_2",
+        "molecule_3"
+      ]
+    },
+    {
+      "id": "node_2308646153408",
+      "type": "merge_molecule",
+      "title": "Merge Molecule",
+      "properties": {
+        "num_proteins": 1,
+        "num_ligands": 1,
+        "add_hydrogens": false,
+        "embed_missing_coords": true,
+        "output_mode": "merged_single"
+      },
+      "position": {
+        "x": 1281.832384977813,
+        "y": 56.04651128828545
+      },
+      "size": {
+        "w": 200.0,
+        "h": 120.0
+      },
+      "inputs": [
+        "protein_1",
+        "ligand_1"
+      ],
+      "outputs": [
+        "molecules"
+      ]
+    },
+    {
+      "id": "node_2310536564864",
+      "type": "web3d_viewer",
+      "title": "3D Web Viewer",
+      "properties": {
+        "protein_pdb": "",
+        "molecules_data": "",
+        "pdb_code": "",
+        "background": "#0e0e0e",
+        "spin": true,
+        "representation": "cartoon+licorice"
+      },
+      "position": {
+        "x": 1546.596237151408,
+        "y": -438.1224634654918
+      },
+      "size": {
+        "w": 520.0,
+        "h": 360.0
+      },
+      "inputs": [
+        "molecules"
+      ],
+      "outputs": [
+        "viewer_url"
+      ]
+    },
+    {
+      "id": "node_2310435077568",
+      "type": "ligand_preparation",
+      "title": "Ligand Preparation",
+      "properties": {
+        "remove_salts": true,
+        "neutralize": true,
+        "add_hydrogens_mode": null,
+        "embed_3d": true,
+        "minimize": true,
+        "force_field": null,
+        "max_iterations": 200,
+        "compute_charges": null,
+        "name": "",
+        "description": ""
+      },
+      "position": {
+        "x": -590.6156875710643,
+        "y": 117.7889843670722
+      },
+      "size": {
+        "w": 200.0,
+        "h": 100.0
+      },
+      "inputs": [
+        "molecule"
+      ],
+      "outputs": [
+        "molecule"
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "conn_2310536741440",
+      "source_node": "node_2310536610240",
+      "source_port": "grid_params",
+      "target_node": "node_2310434994688",
+      "target_port": "grid_params",
+      "label": "data"
+    },
+    {
+      "id": "conn_2308645761024",
+      "source_node": "node_2308646249664",
+      "source_port": "molecules",
+      "target_node": "node_2308645853504",
+      "target_port": "molecules",
+      "label": "molecules"
+    },
+    {
+      "id": "conn_2310536625152",
+      "source_node": "node_2308645853504",
+      "source_port": "molecules",
+      "target_node": "node_2310434994688",
+      "target_port": "receptor_molecules",
+      "label": "molecules"
+    },
+    {
+      "id": "conn_2310536147456",
+      "source_node": "node_2308646331904",
+      "source_port": "file",
+      "target_node": "node_2308646452864",
+      "target_port": "file",
+      "label": "file"
+    },
+    {
+      "id": "conn_2308646087424",
+      "source_node": "node_2310434994688",
+      "source_port": "docking_results",
+      "target_node": "node_2310012992640",
+      "target_port": "docking_results",
+      "label": "data"
+    },
+    {
+      "id": "conn_2310535790080",
+      "source_node": "node_2310434994688",
+      "source_port": "best_pose",
+      "target_node": "node_2310012992640",
+      "target_port": "molecules",
+      "label": "molecules"
+    },
+    {
+      "id": "conn_2308646152448",
+      "source_node": "node_2310434994688",
+      "source_port": "docking_log",
+      "target_node": "node_2310536567872",
+      "target_port": "string",
+      "label": "string"
+    },
+    {
+      "id": "conn_2308648458688",
+      "source_node": "node_2310012992640",
+      "source_port": "analysis_dataframe",
+      "target_node": "node_2308648375488",
+      "target_port": "data",
+      "label": "data"
+    },
+    {
+      "id": "conn_2308648530560",
+      "source_node": "node_2310012992640",
+      "source_port": "analysis_dataframe",
+      "target_node": "node_2310536317248",
+      "target_port": "data",
+      "label": "data"
+    },
+    {
+      "id": "conn_2308648728256",
+      "source_node": "node_2310012992640",
+      "source_port": "best_pose",
+      "target_node": "node_2308648667776",
+      "target_port": "molecules",
+      "label": "molecules"
+    },
+    {
+      "id": "conn_2309826931072",
+      "source_node": "node_2308648667776",
+      "source_port": "molecule_1",
+      "target_node": "node_2308646153408",
+      "target_port": "ligand_1",
+      "label": "molecules"
+    },
+    {
+      "id": "conn_2308646615872",
+      "source_node": "node_2308645853504",
+      "source_port": "molecules",
+      "target_node": "node_2308646153408",
+      "target_port": "protein_1",
+      "label": "molecules"
+    },
+    {
+      "id": "conn_2308648997440",
+      "source_node": "node_2308646153408",
+      "source_port": "molecules",
+      "target_node": "node_2310536564864",
+      "target_port": "molecules",
+      "label": "molecules"
+    },
+    {
+      "id": "conn_2310536316352",
+      "source_node": "node_2308646452864",
+      "source_port": "molecules",
+      "target_node": "node_2310435077568",
+      "target_port": "molecule",
+      "label": "molecules"
+    },
+    {
+      "id": "conn_2308646220736",
+      "source_node": "node_2310435077568",
+      "source_port": "molecule",
+      "target_node": "node_2310434994688",
+      "target_port": "ligand_molecules",
+      "label": "molecules"
+    }
+  ],
+  "metadata": {
+    "version": "1.0",
+    "created_with": "Vera"
+  }
+}

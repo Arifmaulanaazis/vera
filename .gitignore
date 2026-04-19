@@ -1,0 +1,170 @@
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Scrapy stuff:
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# celery beat schedule file
+celerybeat-schedule
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Project specific
+*.pyc
+*.pyo
+*.pyd
+*.tmp
+*.temp
+
+# Compiled Qt resources
+assets/vera_resources.py
+assets/resource_manifest.json
+
+# Temporary files
+*.tmp
+*.bak
+*.backup
+
+# Node.js
+node_modules/
+.next/
+out/
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# GROMACS 2025.1 CPU build — ignore contents, keep folder
+engine/gromacs/gromacs_2025.1_cpu/*
+!engine/gromacs/gromacs_2025.1_cpu/.gitkeep
+
+# GROMACS 2025.1 CUDA build — ignore contents, keep folder
+engine/gromacs/gromacs_2025.1_cuda/*
+!engine/gromacs/gromacs_2025.1_cuda/.gitkeep
+
+# GROMACS 2025.2 CPU build — ignore contents, keep folder
+engine/gromacs/gromacs_2025.2_cpu/*
+!engine/gromacs/gromacs_2025.2_cpu/.gitkeep
+
+# GROMACS 2025.2 CUDA build — ignore contents, keep folder
+engine/gromacs/gromacs_2025.2_cuda/*
+!engine/gromacs/gromacs_2025.2_cuda/.gitkeep
+
+# GROMACS 2026.1 CPU build — ignore contents, keep folder
+engine/gromacs/gromacs_2026.1_cpu/*
+!engine/gromacs/gromacs_2026.1_cpu/.gitkeep
+
+# GROMACS 2026.1 CUDA build — ignore contents, keep folder
+engine/gromacs/gromacs_2026.1_cuda/*
+!engine/gromacs/gromacs_2026.1_cuda/.gitkeep

@@ -1,0 +1,65 @@
+{
+  "nodes": [
+    {
+      "id": "node_2310435075328",
+      "type": "rcsb_pdb",
+      "title": "RCSB PDB",
+      "properties": {
+        "pdb_code": ""
+      },
+      "position": {
+        "x": -939.0,
+        "y": -92.0
+      },
+      "size": {
+        "w": 320.0,
+        "h": 140.0
+      },
+      "inputs": [],
+      "outputs": [
+        "molecules"
+      ]
+    },
+    {
+      "id": "node_2310435291008",
+      "type": "web3d_viewer",
+      "title": "3D Web Viewer",
+      "properties": {
+        "protein_pdb": "",
+        "molecules_data": "",
+        "pdb_code": "",
+        "background": "#0e0e0e",
+        "spin": true,
+        "representation": "cartoon+licorice"
+      },
+      "position": {
+        "x": -308.0,
+        "y": -198.0
+      },
+      "size": {
+        "w": 520.0,
+        "h": 360.0
+      },
+      "inputs": [
+        "molecules"
+      ],
+      "outputs": [
+        "viewer_url"
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "conn_2310536141824",
+      "source_node": "node_2310435075328",
+      "source_port": "molecules",
+      "target_node": "node_2310435291008",
+      "target_port": "molecules",
+      "label": "molecules"
+    }
+  ],
+  "metadata": {
+    "version": "1.0",
+    "created_with": "Vera"
+  }
+}

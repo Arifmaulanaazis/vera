@@ -1,0 +1,1204 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>VERA GROMACS MD Viewer</title>
+    <style>
+      * { box-sizing: border-box; }
+      
+      html, body { 
+        height: 100%; 
+        margin: 0; 
+        overflow: hidden; 
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: #000;
+        color: #fff;
+      }
+      
+      #viewport {
+        width: 100%;
+        height: 100%;
+      }
+      
+      .control-panel {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        width: 300px;
+        max-height: calc(100vh - 40px);
+        overflow-y: auto;
+        z-index: 1000;
+        pointer-events: auto;
+      }
+      
+      .control-panel::-webkit-scrollbar {
+        width: 4px;
+      }
+      
+      .control-panel::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      
+      .control-panel::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 2px;
+      }
+      
+      .panel {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        margin-bottom: 12px;
+        overflow: hidden;
+        font-size: 13px;
+      }
+      
+      .panel-header {
+        padding: 12px 16px;
+        background: rgba(255, 255, 255, 0.02);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        font-weight: 500;
+        cursor: pointer;
+        user-select: none;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        transition: background-color 0.2s ease;
+      }
+      
+      .panel-header:hover {
+        background: rgba(255, 255, 255, 0.05);
+      }
+      
+      .panel-header::after {
+        content: '−';
+        font-size: 16px;
+        line-height: 1;
+        transition: transform 0.2s ease;
+      }
+      
+      .panel-header.collapsed::after {
+        transform: rotate(90deg);
+        content: '+';
+      }
+      
+      .panel-content {
+        padding: 16px;
+        transition: all 0.2s ease;
+      }
+      
+      .panel-content.collapsed {
+        display: none;
+      }
+      
+      .control-group {
+        margin-bottom: 16px;
+      }
+      
+      .control-group:last-child {
+        margin-bottom: 0;
+      }
+      
+      label {
+        display: block;
+        margin-bottom: 6px;
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.8);
+        font-weight: 400;
+      }
+      
+      input, select, button {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 4px;
+        background: rgba(255, 255, 255, 0.05);
+        color: #fff;
+        font-size: 12px;
+        font-family: inherit;
+        transition: all 0.2s ease;
+      }
+      
+      input:focus, select:focus {
+        outline: none;
+        border-color: rgba(66, 153, 225, 0.6);
+        background: rgba(255, 255, 255, 0.08);
+      }
+      
+      button {
+        background: rgba(255, 255, 255, 0.1);
+        cursor: pointer;
+        font-weight: 400;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+      
+      button:hover {
+        background: rgba(255, 255, 255, 0.15);
+      }
+      
+      button:active {
+        background: rgba(255, 255, 255, 0.2);
+      }
+      
+      button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      
+      .checkbox-group {
+        display: flex;
+        align-items: center;
+        margin-bottom: 8px;
+        padding: 4px 0;
+      }
+      
+      .checkbox-group input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+        margin-right: 8px;
+        flex-shrink: 0;
+      }
+      
+      .checkbox-group label {
+        margin-bottom: 0;
+        cursor: pointer;
+        flex: 1;
+        font-size: 12px;
+      }
+      
+      .slider-group {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      
+      .slider-group input[type="range"] {
+        flex: 1;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 2px;
+        outline: none;
+        padding: 0;
+      }
+      
+      .slider-group input[type="range"]::-webkit-slider-thumb {
+        appearance: none;
+        width: 14px;
+        height: 14px;
+        background: #fff;
+        border-radius: 50%;
+        cursor: pointer;
+      }
+      
+      .slider-value {
+        min-width: 40px;
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.6);
+        text-align: right;
+      }
+      
+      .playback-controls {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 12px;
+      }
+      
+      .playback-controls button {
+        flex: 1;
+        padding: 8px 6px;
+        font-size: 12px;
+      }
+      
+      .frame-info {
+        text-align: center;
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.6);
+        margin-bottom: 8px;
+      }
+      
+      .loading, .error {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 2000;
+        text-align: center;
+        padding: 20px;
+        border-radius: 8px;
+        backdrop-filter: blur(20px);
+      }
+      
+      .loading {
+        background: rgba(0, 0, 0, 0.7);
+        color: #fff;
+        display: none;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      
+      .error {
+        background: rgba(220, 38, 38, 0.8);
+        color: white;
+        display: none;
+        border: 1px solid rgba(239, 68, 68, 0.5);
+      }
+      
+      .toolbar {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        display: flex;
+        gap: 8px;
+        z-index: 1000;
+      }
+      
+      .toolbar button {
+        width: 36px;
+        height: 36px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 6px;
+        color: rgba(255, 255, 255, 0.8);
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+      
+      .toolbar button:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+      }
+      
+      .stats {
+        position: absolute;
+        bottom: 20px;
+        left: 20px;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(20px);
+        padding: 8px 12px;
+        border-radius: 4px;
+        font-size: 11px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.8);
+      }
+      
+      .toggle-panel {
+        position: absolute;
+        top: 20px;
+        right: 335px;
+        width: 24px;
+        height: 36px;
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 6px 0 0 6px;
+        border-right: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 12px;
+        transition: all 0.2s ease;
+        z-index: 1001;
+      }
+      
+      .toggle-panel:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.9);
+      }
+      
+      .control-panel.hidden {
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+      }
+      
+      .control-panel.hidden + .toggle-panel {
+        right: 20px;
+        border-radius: 6px;
+        border-right: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      
+      .selection-group {
+        display: flex;
+        gap: 4px;
+        margin-bottom: 8px;
+      }
+      
+      .selection-group input {
+        flex: 1;
+      }
+      
+      .selection-group button {
+        width: auto;
+        padding: 8px 12px;
+      }
+      
+      .preset-buttons {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+        margin-bottom: 12px;
+      }
+      
+      .preset-buttons button {
+        padding: 6px 8px;
+        font-size: 11px;
+        font-weight: 400;
+      }
+    </style>
+    <!-- NGL.js loader -->
+    <script>
+      function loadNGL() {
+        const sources = [
+          './vendor/ngl.js',
+          './ngl.js',
+          'https://cdn.jsdelivr.net/npm/ngl@2.2.1/dist/ngl.js',
+          'https://unpkg.com/ngl@2.2.1/dist/ngl.js'
+        ];
+
+        function tryLoad(index) {
+          if (index >= sources.length) {
+            console.error('Failed to load NGL.js from all sources');
+            showError('Failed to load NGL.js library. Place ngl.js in web/vendor/ngl.js for offline use.');
+            return;
+          }
+
+          const script = document.createElement('script');
+          script.src = sources[index];
+          script.onload = function () {
+            console.log('NGL.js loaded from:', sources[index]);
+            initViewer();
+          };
+          script.onerror = function () {
+            console.warn('Failed to load NGL.js from:', sources[index]);
+            tryLoad(index + 1);
+          };
+          document.head.appendChild(script);
+        }
+
+        tryLoad(0);
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', loadNGL);
+      } else {
+        loadNGL();
+      }
+    </script>
+  </head>
+  <body>
+    <div id="viewport"></div>
+    
+    <div class="loading" id="loading">
+      <div style="font-size: 16px; margin-bottom: 8px;">Loading MD trajectory...</div>
+    </div>
+    
+    <div class="error" id="error"></div>
+    
+    <div class="toolbar">
+      <button onclick="resetView()" title="Reset View">🏠</button>
+      <button onclick="centerView()" title="Center">📍</button>
+      <button onclick="fullscreen()" title="Fullscreen">⛶</button>
+    </div>
+    
+    <div class="stats" id="stats">
+      FPS: <span id="fps">--</span> | Frame: <span id="current-frame">--</span>/<span id="total-frames">--</span> | Atoms: <span id="atom-count">--</span>
+    </div>
+    
+    <div class="toggle-panel" onclick="toggleControlPanel()">‹</div>
+    
+    <div class="control-panel" id="control-panel">
+      <!-- Trajectory Control Panel -->
+      <div class="panel">
+        <div class="panel-header" onclick="togglePanel(this)">
+          Trajectory Playback
+        </div>
+        <div class="panel-content">
+          <div class="frame-info">
+            Frame <span id="frame-display">1</span> of <span id="frame-total">1</span>
+          </div>
+          
+          <div class="control-group">
+            <div class="slider-group">
+              <input type="range" id="frame-slider" min="0" max="0" value="0" onchange="setFrame(this.value)">
+              <span class="slider-value" id="frame-value">0</span>
+            </div>
+          </div>
+          
+          <div class="control-group">
+            <div class="playback-controls">
+              <button id="play-btn" onclick="playTrajectory()">▶ Play</button>
+              <button id="pause-btn" onclick="pauseTrajectory()" disabled>⏸ Pause</button>
+              <button onclick="stopTrajectory()">⏹ Stop</button>
+            </div>
+          </div>
+          
+          <div class="control-group">
+            <label>Speed (FPS):</label>
+            <div class="slider-group">
+              <input type="range" id="speed-slider" min="1" max="30" value="12" onchange="setPlaybackSpeed(this.value)">
+              <span class="slider-value" id="speed-value">12</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Selection Panel -->
+      <div class="panel">
+        <div class="panel-header" onclick="togglePanel(this)">
+          Selection
+        </div>
+        <div class="panel-content">
+          <div class="control-group">
+            <label>Selection (MDAnalysis syntax):</label>
+            <div class="selection-group">
+              <input type="text" id="selection-input" placeholder="protein or all">
+              <button onclick="applySelection()">Apply</button>
+            </div>
+          </div>
+          
+          <div class="control-group">
+            <div class="preset-buttons">
+              <button onclick="setSelection('all')">All</button>
+              <button onclick="setSelection('protein')">Protein</button>
+              <button onclick="setSelection('backbone')">Backbone</button>
+              <button onclick="setSelection('name CA')">CA Only</button>
+              <button onclick="setSelection('not water')">No Water</button>
+              <button onclick="setLigandSelection()">Ligands</button>
+            </div>
+          </div>
+          
+          <div class="control-group">
+            <div class="checkbox-group">
+              <input type="checkbox" id="show-water" onchange="updateVisibility()">
+              <label for="show-water">Show Water</label>
+            </div>
+            <div class="checkbox-group">
+              <input type="checkbox" id="show-ions" onchange="updateVisibility()">
+              <label for="show-ions">Show Ions</label>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Representation Panel -->
+      <div class="panel">
+        <div class="panel-header" onclick="togglePanel(this)">
+          Representation
+        </div>
+        <div class="panel-content">
+          <div class="control-group">
+            <div class="preset-buttons">
+              <button onclick="applyPreset('cartoon')">Cartoon</button>
+              <button onclick="applyPreset('licorice')">Licorice</button>
+              <button onclick="applyPreset('spacefill')">Spacefill</button>
+              <button onclick="applyPreset('tube')">Tube</button>
+            </div>
+          </div>
+          
+          <div class="control-group">
+            <div class="checkbox-group">
+              <input type="checkbox" id="show-cartoon" onchange="updateRepresentations()">
+              <label for="show-cartoon">Cartoon</label>
+            </div>
+            <div class="checkbox-group">
+              <input type="checkbox" id="show-licorice" onchange="updateRepresentations()">
+              <label for="show-licorice">Licorice</label>
+            </div>
+            <div class="checkbox-group">
+              <input type="checkbox" id="show-ball-stick" onchange="updateRepresentations()">
+              <label for="show-ball-stick">Ball & Stick</label>
+            </div>
+            <div class="checkbox-group">
+              <input type="checkbox" id="show-spacefill" onchange="updateRepresentations()">
+              <label for="show-spacefill">Spacefill</label>
+            </div>
+          </div>
+          
+          <div class="control-group">
+            <label>Color Scheme:</label>
+            <select id="color-scheme" onchange="updateRepresentations()">
+              <option value="sstruc">Secondary Structure</option>
+              <option value="element">Element</option>
+              <option value="residueindex">Residue Index</option>
+              <option value="chainid">Chain ID</option>
+              <option value="hydrophobicity">Hydrophobicity</option>
+              <option value="bfactor">B-factor</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Display Settings Panel -->
+      <div class="panel">
+        <div class="panel-header" onclick="togglePanel(this)">
+          Display
+        </div>
+        <div class="panel-content">
+          <div class="control-group">
+            <label>Background Color:</label>
+            <input type="color" id="bg-color" value="#000000" onchange="updateBackground()">
+          </div>
+          
+          <div class="control-group">
+            <label>Quality:</label>
+            <select id="cartoon-quality" onchange="updateRepresentations()">
+              <option value="low">Low</option>
+              <option value="medium" selected>Medium</option>
+              <option value="high">High</option>
+            </select>
+          </div>
+          
+          <div class="control-group">
+            <div class="checkbox-group">
+              <input type="checkbox" id="auto-spin" onchange="toggleSpin()">
+              <label for="auto-spin">Auto Rotate</label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Global variables
+      let stage = null;
+      let trajComponent = null;
+      let currentFrame = 0;
+      let totalFrames = 1;
+      let isPlaying = false;
+      let playbackTimer = null;
+      let playbackSpeed = 12; // FPS
+      let trajData = null;
+      
+      function showLoading(show = true) {
+        document.getElementById('loading').style.display = show ? 'block' : 'none';
+      }
+      
+      function showError(message) {
+        console.error('GROMACS Viewer error:', message);
+        const errorEl = document.getElementById('error');
+        errorEl.textContent = message;
+        errorEl.style.display = 'block';
+        showLoading(false);
+        setTimeout(() => { errorEl.style.display = 'none'; }, 5000);
+      }
+      
+      function getParam(name) { 
+        const u = new URL(window.location.href); 
+        return u.searchParams.get(name); 
+      }
+      
+      // Initialize viewer
+      function initViewer() {
+        if (typeof NGL === 'undefined') {
+          showError('NGL.js library failed to load properly.');
+          return;
+        }
+        
+        console.log('Initializing GROMACS MD viewer...');
+        
+        try {
+          stage = new NGL.Stage('viewport', { 
+            backgroundColor: getParam('bg') || '#000000',
+            tooltip: true,
+            ambientColor: 0x404040,
+            ambientIntensity: 0.4,
+            lightColor: 0xffffff,
+            lightIntensity: 1.2,
+            fogNear: 50,
+            fogFar: 100,
+            cameraType: 'perspective'
+          });
+          
+          // Additional lighting settings for better 3D visualization
+          try {
+            stage.setParameters({
+              ambientColor: 0x404040,
+              ambientIntensity: 0.4,
+              lightColor: 0xffffff,
+              lightIntensity: 1.2,
+              fogNear: 50,
+              fogFar: 100,
+              cameraType: 'perspective',
+              clipNear: 0,
+              clipFar: 100,
+              clipDist: 10
+            });
+          } catch (e) {
+            console.log('Could not set additional stage parameters:', e);
+          }
+          
+          window.addEventListener('resize', () => stage.handleResize(), false);
+          
+          // Initialize FPS counter
+          let lastTime = performance.now();
+          let frameCount = 0;
+          
+          function updateStats() {
+            const now = performance.now();
+            frameCount++;
+            
+            if (now - lastTime >= 1000) {
+              const fps = Math.round(frameCount * 1000 / (now - lastTime));
+              document.getElementById('fps').textContent = fps;
+              frameCount = 0;
+              lastTime = now;
+            }
+            
+            requestAnimationFrame(updateStats);
+          }
+          updateStats();
+          
+          // Load initial data from URL parameters
+          loadFromURLParams();
+          
+        } catch (error) {
+          console.error('Error initializing GROMACS MD viewer:', error);
+          showError(`Failed to initialize MD viewer: ${error.message}`);
+        }
+      }
+      
+      // URL parameter loading
+      async function loadFromURLParams() {
+        const groFile = getParam('gro_file');
+        const xtcFile = getParam('xtc_file');
+        const trajDataParam = getParam('traj_data');
+        const trajFile = getParam('traj_file');
+        
+        if (trajFile) {
+          await loadFromTrajectoryFile(trajFile);
+        } else if (trajDataParam) {
+          await loadFromTrajectoryData(trajDataParam);
+        } else if (groFile) {
+          await loadFromFiles(groFile, xtcFile);
+        } else {
+          // Show help message if no data provided
+          showError('No trajectory data provided. Please connect GRO and/or XTC files to the GROMACS Viewer node.');
+        }
+      }
+      
+      async function loadFromFiles(groFile, xtcFile) {
+        try {
+          console.log('Loading GROMACS files:', groFile, xtcFile);
+          showLoading();
+          
+          // Load topology from GRO file
+          const topology = await stage.loadFile(decodeURIComponent(groFile), { ext: 'gro' });
+          trajComponent = topology;
+          
+          // If trajectory file provided, setup frame data
+          if (xtcFile) {
+            // For web viewer, we'll need the trajectory to be pre-processed server-side
+            // and passed as PDB frames or similar format that NGL can handle
+            console.log('XTC trajectory support requires server-side processing');
+            totalFrames = 1; // Default to single frame for now
+          } else {
+            totalFrames = 1;
+          }
+          
+          setupDefaultRepresentation();
+          stage.autoView();
+          updateUI();
+          showLoading(false);
+          
+        } catch (error) {
+          console.error('Failed to load GROMACS files:', error);
+          showError(`Failed to load MD files: ${error.message}`);
+        }
+      }
+      
+      async function loadFromTrajectoryData(encodedData) {
+        try {
+          console.log('Loading trajectory data from encoded parameter...');
+          showLoading();
+          
+          // Decode trajectory data (expected to be JSON with frame data)
+          const trajJson = atob(decodeURIComponent(encodedData));
+          trajData = JSON.parse(trajJson);
+          
+          if (trajData.frames && trajData.frames.length > 0) {
+            totalFrames = trajData.frames.length;
+            
+            // Load first frame
+            const firstFrame = trajData.frames[0];
+            const blob = new Blob([firstFrame], { type: 'text/plain' });
+            trajComponent = await stage.loadFile(blob, { ext: 'pdb', name: 'MD Frame' });
+            
+            setupDefaultRepresentation();
+            stage.autoView();
+            updateUI();
+            showLoading(false);
+          } else {
+            throw new Error('No frames found in trajectory data');
+          }
+          
+        } catch (error) {
+          console.error('Failed to load trajectory data:', error);
+          showError(`Failed to load trajectory data: ${error.message}`);
+        }
+      }
+
+      // Load trajectory from an on-disk index JSON file containing frame file URLs
+      async function loadFromTrajectoryFile(trajFile) {
+        try {
+          console.log('Loading trajectory file (index):', trajFile);
+          showLoading();
+
+          const url = decodeURIComponent(trajFile);
+          const response = await fetch(url);
+          if (!response.ok) {
+            throw new Error(`Failed to read trajectory index (${response.status})`);
+          }
+          const json = await response.json();
+          trajData = json;
+
+          if (trajData.frameFiles && trajData.frameFiles.length > 0) {
+            totalFrames = trajData.frameFiles.length;
+            await loadFrameFile(trajData.frameFiles[0]);
+            setupDefaultRepresentation();
+            stage.autoView();
+            updateUI();
+            showLoading(false);
+          } else if (trajData.frames && trajData.frames.length > 0) {
+            // Fallback support if frames are embedded directly in JSON
+            totalFrames = trajData.frames.length;
+            const firstFrame = trajData.frames[0];
+            const blob = new Blob([firstFrame], { type: 'text/plain' });
+            trajComponent = await stage.loadFile(blob, { ext: 'pdb', name: 'MD Frame' });
+            setupDefaultRepresentation();
+            stage.autoView();
+            updateUI();
+            showLoading(false);
+          } else {
+            throw new Error('Trajectory index contains no frames');
+          }
+        } catch (error) {
+          console.error('Failed to load trajectory file:', error);
+          showError(`Failed to load trajectory file: ${error.message}`);
+        }
+      }
+      
+      function setupDefaultRepresentation() {
+        if (!trajComponent) return;
+        
+        trajComponent.removeAllRepresentations();
+        
+        // Default representation based on structure
+        const structure = trajComponent.structure;
+        const atomCount = structure.atomCount || 0;
+        
+        if (atomCount > 1000) {
+          // Large system - use cartoon for protein, licorice for small molecules
+          trajComponent.addRepresentation('cartoon', { 
+            sele: 'protein', 
+            colorScheme: 'sstruc',
+            quality: 'medium'
+          });
+          trajComponent.addRepresentation('licorice', { 
+            sele: 'hetero and not water',
+            colorScheme: 'element'
+          });
+          document.getElementById('show-cartoon').checked = true;
+          document.getElementById('show-licorice').checked = true;
+        } else {
+          // Small system - use licorice
+          trajComponent.addRepresentation('licorice', { 
+            colorScheme: 'element'
+          });
+          document.getElementById('show-licorice').checked = true;
+        }
+        
+        // Fix lighting and camera settings for better 3D visualization
+        try {
+          stage.setParameters({
+            ambientColor: 0x404040,
+            ambientIntensity: 0.4,
+            hoverColor: 0x00ff00,
+            lightColor: 0xffffff,
+            lightIntensity: 1.2,
+            fogNear: 50,
+            fogFar: 100,
+            cameraType: 'perspective',
+            cameraEyeSep: 0.3,
+            clipNear: 0,
+            clipFar: 100,
+            clipDist: 10
+          });
+        } catch (e) {
+          console.log('Could not set stage parameters:', e);
+        }
+        
+        updateAtomCount();
+      }
+      
+      // Trajectory playback functions
+      function playTrajectory() {
+        if (totalFrames <= 1) return;
+        
+        isPlaying = true;
+        document.getElementById('play-btn').disabled = true;
+        document.getElementById('pause-btn').disabled = false;
+        
+        playbackTimer = setInterval(() => {
+          currentFrame = (currentFrame + 1) % totalFrames;
+          setFrame(currentFrame);
+        }, 1000 / playbackSpeed);
+      }
+      
+      function pauseTrajectory() {
+        isPlaying = false;
+        document.getElementById('play-btn').disabled = false;
+        document.getElementById('pause-btn').disabled = true;
+        
+        if (playbackTimer) {
+          clearInterval(playbackTimer);
+          playbackTimer = null;
+        }
+      }
+      
+      function stopTrajectory() {
+        pauseTrajectory();
+        currentFrame = 0;
+        setFrame(0);
+      }
+      
+      function setFrame(frameIndex) {
+        frameIndex = parseInt(frameIndex);
+        if (frameIndex < 0 || frameIndex >= totalFrames) return;
+        
+        currentFrame = frameIndex;
+        
+        // Update frame display
+        updateFrameDisplay();
+        
+        // Load frame data if available
+        if (trajData) {
+          if (trajData.frames && trajData.frames[frameIndex]) {
+            loadFrameData(trajData.frames[frameIndex]);
+          } else if (trajData.frameFiles && trajData.frameFiles[frameIndex]) {
+            loadFrameFile(trajData.frameFiles[frameIndex]);
+          }
+        }
+      }
+      
+      async function loadFrameData(frameData) {
+        try {
+          if (!trajComponent) return;
+          
+          // Create new component for this frame
+          const blob = new Blob([frameData], { type: 'text/plain' });
+          const newComponent = await stage.loadFile(blob, { ext: 'pdb', name: `Frame ${currentFrame}` });
+          
+          // Copy representations from current component
+          const representations = trajComponent.reprList.slice();
+          
+          // Remove old component
+          stage.removeComponent(trajComponent);
+          
+          // Set new component
+          trajComponent = newComponent;
+          
+          // Restore representations
+          representations.forEach(repr => {
+            trajComponent.addRepresentation(repr.type, repr.getParameters());
+          });
+          
+        } catch (error) {
+          console.error('Error loading frame data:', error);
+        }
+      }
+
+      // Load a frame from a local file URL using fetch, then delegate to loadFrameData
+      async function loadFrameFile(fileUrl) {
+        try {
+          const url = decodeURIComponent(fileUrl);
+          const response = await fetch(url);
+          if (!response.ok) {
+            throw new Error(`Failed to read frame file (${response.status})`);
+          }
+          const text = await response.text();
+          await loadFrameData(text);
+        } catch (error) {
+          console.error('Error loading frame file:', error);
+        }
+      }
+      
+      function updateFrameDisplay() {
+        document.getElementById('frame-display').textContent = currentFrame + 1;
+        document.getElementById('frame-total').textContent = totalFrames;
+        document.getElementById('frame-value').textContent = currentFrame;
+        document.getElementById('frame-slider').value = currentFrame;
+        document.getElementById('current-frame').textContent = currentFrame + 1;
+        document.getElementById('total-frames').textContent = totalFrames;
+      }
+      
+      function setPlaybackSpeed(speed) {
+        playbackSpeed = parseInt(speed);
+        document.getElementById('speed-value').textContent = speed;
+        
+        // Restart timer with new speed if playing
+        if (isPlaying && playbackTimer) {
+          clearInterval(playbackTimer);
+          playbackTimer = setInterval(() => {
+            currentFrame = (currentFrame + 1) % totalFrames;
+            setFrame(currentFrame);
+          }, 1000 / playbackSpeed);
+        }
+      }
+      
+      // Selection functions
+      function setSelection(selection) {
+        document.getElementById('selection-input').value = selection;
+        applySelection();
+      }
+      
+      function setLigandSelection() {
+        // Smart ligand detection - try multiple approaches
+        if (!trajComponent || !trajComponent.structure) {
+          setSelection('hetero and not water');
+          return;
+        }
+        
+        const structure = trajComponent.structure;
+        const resnames = new Set();
+        
+        // Collect all residue names
+        structure.eachResidue(function(rp) {
+          if (rp.resname) {
+            resnames.add(rp.resname);
+          }
+        });
+        
+        // Common water, ion, and protein residue names to exclude
+        const excludeResnames = new Set([
+          'HOH', 'WAT', 'TIP3', 'TIP4', 'SPC', 'SPCE', 'OPC', 'TIP5',  // Water
+          'NA', 'CL', 'K', 'CA', 'MG', 'ZN', 'FE', 'CU', 'MN', 'ION',  // Ions
+          'SOD', 'CLA', 'POT', 'CAL', 'ZN2', 'MG2', 'CA2', 'FE2', 'FE3',  // More ions
+          'ALA', 'ARG', 'ASN', 'ASP', 'CYS', 'GLN', 'GLU', 'GLY', 'HIS',  // Standard amino acids
+          'ILE', 'LEU', 'LYS', 'MET', 'PHE', 'PRO', 'SER', 'THR', 'TRP',
+          'TYR', 'VAL', 'HID', 'HIE', 'HIP', 'HSD', 'HSE', 'HSP', 'CYX',  // Variants
+          'A', 'T', 'G', 'C', 'U', 'DA', 'DT', 'DG', 'DC', 'DU',  // Nucleotides
+          'ATP', 'ADP', 'AMP', 'GTP', 'GDP', 'GMP', 'CTP', 'CDP', 'CMP',  // Common metabolites (keep these as ligands)
+          'UTP', 'UDP', 'UMP'
+        ]);
+        
+        // Find potential ligands
+        const ligandResnames = [];
+        for (const resname of resnames) {
+          if (!excludeResnames.has(resname)) {
+            ligandResnames.push(resname);
+          }
+        }
+        
+        let selection;
+        if (ligandResnames.length > 0) {
+          // Create selection string for detected ligands
+          selection = ligandResnames.map(name => `resname ${name}`).join(' or ');
+          console.log('Detected ligand residues:', ligandResnames);
+        } else {
+          // Fallback to generic hetero selection
+          selection = 'hetero and not water and not ion';
+          console.log('No specific ligands detected, using generic selection');
+        }
+        
+        setSelection(selection);
+      }
+      
+      function applySelection() {
+        const selection = document.getElementById('selection-input').value || 'all';
+        console.log('Applying selection:', selection);
+        
+        if (!trajComponent) return;
+        
+        // Remove existing representations
+        trajComponent.removeAllRepresentations();
+        
+        // Apply new representations with selection
+        updateRepresentations();
+      }
+      
+      function updateVisibility() {
+        // This would typically filter representations based on checkboxes
+        // For now, just log the state
+        const showWater = document.getElementById('show-water').checked;
+        const showIons = document.getElementById('show-ions').checked;
+        console.log('Visibility update:', { showWater, showIons });
+      }
+      
+      // Representation functions
+      function applyPreset(preset) {
+        // Clear all checkboxes first
+        document.getElementById('show-cartoon').checked = false;
+        document.getElementById('show-licorice').checked = false;
+        document.getElementById('show-ball-stick').checked = false;
+        document.getElementById('show-spacefill').checked = false;
+        
+        if (!trajComponent) return;
+        
+        trajComponent.removeAllRepresentations();
+        
+        const selection = document.getElementById('selection-input').value || 'all';
+        const colorScheme = document.getElementById('color-scheme').value;
+        
+        switch (preset) {
+          case 'cartoon':
+            trajComponent.addRepresentation('cartoon', { 
+              sele: selection,
+              colorScheme: colorScheme,
+              quality: document.getElementById('cartoon-quality').value
+            });
+            document.getElementById('show-cartoon').checked = true;
+            break;
+          case 'licorice':
+            trajComponent.addRepresentation('licorice', { 
+              sele: selection,
+              colorScheme: colorScheme
+            });
+            document.getElementById('show-licorice').checked = true;
+            break;
+          case 'spacefill':
+            trajComponent.addRepresentation('spacefill', { 
+              sele: selection,
+              colorScheme: colorScheme
+            });
+            document.getElementById('show-spacefill').checked = true;
+            break;
+          case 'tube':
+            trajComponent.addRepresentation('tube', { 
+              sele: selection,
+              colorScheme: colorScheme
+            });
+            break;
+        }
+      }
+      
+      function updateRepresentations() {
+        if (!trajComponent) return;
+        
+        const selection = document.getElementById('selection-input').value || 'all';
+        const colorScheme = document.getElementById('color-scheme').value;
+        const quality = document.getElementById('cartoon-quality').value;
+        
+        trajComponent.removeAllRepresentations();
+        
+        if (document.getElementById('show-cartoon').checked) {
+          trajComponent.addRepresentation('cartoon', { sele: selection, colorScheme, quality });
+        }
+        if (document.getElementById('show-licorice').checked) {
+          trajComponent.addRepresentation('licorice', { sele: selection, colorScheme });
+        }
+        if (document.getElementById('show-ball-stick').checked) {
+          trajComponent.addRepresentation('ball+stick', { sele: selection, colorScheme });
+        }
+        if (document.getElementById('show-spacefill').checked) {
+          trajComponent.addRepresentation('spacefill', { sele: selection, colorScheme });
+        }
+      }
+      
+      // UI Functions
+      function togglePanel(header) {
+        const content = header.nextElementSibling;
+        const isCollapsed = content.classList.contains('collapsed');
+        
+        if (isCollapsed) {
+          content.classList.remove('collapsed');
+          header.classList.remove('collapsed');
+        } else {
+          content.classList.add('collapsed');
+          header.classList.add('collapsed');
+        }
+      }
+      
+      function toggleControlPanel() {
+        const panel = document.getElementById('control-panel');
+        const toggle = document.querySelector('.toggle-panel');
+        const isHidden = panel.classList.contains('hidden');
+        
+        if (isHidden) {
+          panel.classList.remove('hidden');
+          toggle.innerHTML = '‹';
+        } else {
+          panel.classList.add('hidden');
+          toggle.innerHTML = '›';
+        }
+      }
+      
+      // Visual settings
+      function updateBackground() {
+        const color = document.getElementById('bg-color').value;
+        if (stage) {
+          stage.setBackground(color);
+        }
+      }
+      
+      function toggleSpin() {
+        const spin = document.getElementById('auto-spin').checked;
+        if (stage) {
+          stage.setSpin(spin);
+        }
+      }
+      
+      // Toolbar functions
+      function resetView() {
+        if (stage) {
+          stage.autoView(1000);
+        }
+      }
+      
+      function centerView() {
+        if (stage) {
+          stage.autoView(500);
+        }
+      }
+      
+      function fullscreen() {
+        if (document.fullscreenElement) {
+          document.exitFullscreen();
+        } else {
+          document.documentElement.requestFullscreen();
+        }
+      }
+      
+      function updateAtomCount() {
+        try {
+          let totalAtoms = 0;
+          if (trajComponent && trajComponent.structure && trajComponent.structure.atomCount) {
+            totalAtoms = trajComponent.structure.atomCount;
+          }
+          const countElement = document.getElementById('atom-count');
+          if (countElement) {
+            countElement.textContent = totalAtoms > 0 ? totalAtoms.toLocaleString() : '--';
+          }
+        } catch (error) {
+          console.error('Error updating atom count:', error);
+          const countElement = document.getElementById('atom-count');
+          if (countElement) {
+            countElement.textContent = '--';
+          }
+        }
+      }
+      
+      function updateUI() {
+        updateFrameDisplay();
+        updateAtomCount();
+        
+        // Update frame slider
+        const slider = document.getElementById('frame-slider');
+        slider.max = Math.max(0, totalFrames - 1);
+        slider.value = currentFrame;
+        
+        // Enable/disable playback controls
+        const hasMultipleFrames = totalFrames > 1;
+        document.getElementById('play-btn').disabled = !hasMultipleFrames || isPlaying;
+        document.getElementById('pause-btn').disabled = !hasMultipleFrames || !isPlaying;
+      }
+      
+    </script>
+  </body>
+</html>

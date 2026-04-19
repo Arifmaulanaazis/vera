@@ -1,0 +1,227 @@
+{
+  "nodes": [
+    {
+      "id": "node_2310535787776",
+      "type": "merge_dataframes",
+      "title": "Dataframe Merge",
+      "properties": {
+        "how": "inner",
+        "left_on": [],
+        "right_on": [],
+        "auto_detect_keys": true,
+        "suffix_left": "_x",
+        "suffix_right": "_y",
+        "auto_refresh_preview": true,
+        "no_keys_behavior": "zip_by_index"
+      },
+      "position": {
+        "x": -502.0,
+        "y": -218.0
+      },
+      "size": {
+        "w": 560.0,
+        "h": 280.0
+      },
+      "inputs": [
+        "left",
+        "right"
+      ],
+      "outputs": [
+        "data"
+      ]
+    },
+    {
+      "id": "node_2310434920960",
+      "type": "excel_reader",
+      "title": "Excel Reader",
+      "properties": {
+        "file_paths": "",
+        "sheet": "",
+        "header": true,
+        "engine": "auto"
+      },
+      "position": {
+        "x": -808.0,
+        "y": -296.0
+      },
+      "size": {
+        "w": 200.0,
+        "h": 100.0
+      },
+      "inputs": [
+        "files",
+        "file"
+      ],
+      "outputs": [
+        "data"
+      ]
+    },
+    {
+      "id": "node_2310536427968",
+      "type": "excel_reader",
+      "title": "Excel Reader",
+      "properties": {
+        "file_paths": "",
+        "sheet": "",
+        "header": true,
+        "engine": "auto"
+      },
+      "position": {
+        "x": -811.0,
+        "y": -5.0
+      },
+      "size": {
+        "w": 200.0,
+        "h": 100.0
+      },
+      "inputs": [
+        "files",
+        "file"
+      ],
+      "outputs": [
+        "data"
+      ]
+    },
+    {
+      "id": "node_2310536612480",
+      "type": "file_input",
+      "title": "File Input",
+      "properties": {
+        "file_paths": ""
+      },
+      "position": {
+        "x": -1214.0,
+        "y": -306.0
+      },
+      "size": {
+        "w": 260.0,
+        "h": 120.0
+      },
+      "inputs": [],
+      "outputs": [
+        "files",
+        "file",
+        "file_paths"
+      ]
+    },
+    {
+      "id": "node_2308645782144",
+      "type": "file_input",
+      "title": "File Input",
+      "properties": {
+        "file_paths": ""
+      },
+      "position": {
+        "x": -1222.0,
+        "y": -22.0
+      },
+      "size": {
+        "w": 260.0,
+        "h": 120.0
+      },
+      "inputs": [],
+      "outputs": [
+        "files",
+        "file",
+        "file_paths"
+      ]
+    },
+    {
+      "id": "node_2310536744000",
+      "type": "table_view",
+      "title": "Table View",
+      "properties": {},
+      "position": {
+        "x": 372.0,
+        "y": -354.0
+      },
+      "size": {
+        "w": 360.0,
+        "h": 220.0
+      },
+      "inputs": [
+        "data"
+      ],
+      "outputs": []
+    },
+    {
+      "id": "node_2310434798784",
+      "type": "save_dataframe",
+      "title": "Save DataFrame",
+      "properties": {
+        "output_path": "",
+        "file_type": "auto",
+        "overwrite": true,
+        "include_index": false
+      },
+      "position": {
+        "x": 405.0,
+        "y": 25.0
+      },
+      "size": {
+        "w": 320.0,
+        "h": 140.0
+      },
+      "inputs": [
+        "data"
+      ],
+      "outputs": [
+        "saved_file"
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "conn_2310536677504",
+      "source_node": "node_2310434920960",
+      "source_port": "data",
+      "target_node": "node_2310535787776",
+      "target_port": "left",
+      "label": "data"
+    },
+    {
+      "id": "conn_2308645658880",
+      "source_node": "node_2310536427968",
+      "source_port": "data",
+      "target_node": "node_2310535787776",
+      "target_port": "right",
+      "label": "data"
+    },
+    {
+      "id": "conn_2308645749632",
+      "source_node": "node_2310536612480",
+      "source_port": "file",
+      "target_node": "node_2310434920960",
+      "target_port": "file",
+      "label": "file"
+    },
+    {
+      "id": "conn_2310013192320",
+      "source_node": "node_2308645782144",
+      "source_port": "file",
+      "target_node": "node_2310536427968",
+      "target_port": "file",
+      "label": "file"
+    },
+    {
+      "id": "conn_2310536752064",
+      "source_node": "node_2310535787776",
+      "source_port": "data",
+      "target_node": "node_2310536744000",
+      "target_port": "data",
+      "label": "data"
+    },
+    {
+      "id": "conn_2310536620672",
+      "source_node": "node_2310535787776",
+      "source_port": "data",
+      "target_node": "node_2310434798784",
+      "target_port": "data",
+      "label": "data"
+    }
+  ],
+  "metadata": {
+    "version": "1.0",
+    "created_with": "Vera"
+  }
+}

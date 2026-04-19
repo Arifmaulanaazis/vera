@@ -1,0 +1,158 @@
+{
+  "nodes": [
+    {
+      "id": "node_2310434920960",
+      "type": "excel_reader",
+      "title": "Excel Reader",
+      "properties": {
+        "file_paths": "",
+        "sheet": "",
+        "header": true,
+        "engine": "auto"
+      },
+      "position": {
+        "x": -808.0,
+        "y": -296.0
+      },
+      "size": {
+        "w": 200.0,
+        "h": 100.0
+      },
+      "inputs": [
+        "files",
+        "file"
+      ],
+      "outputs": [
+        "data"
+      ]
+    },
+    {
+      "id": "node_2310536612480",
+      "type": "file_input",
+      "title": "File Input",
+      "properties": {
+        "file_paths": ""
+      },
+      "position": {
+        "x": -1214.0,
+        "y": -306.0
+      },
+      "size": {
+        "w": 260.0,
+        "h": 120.0
+      },
+      "inputs": [],
+      "outputs": [
+        "files",
+        "file",
+        "file_paths"
+      ]
+    },
+    {
+      "id": "node_2310536744000",
+      "type": "table_view",
+      "title": "Table View",
+      "properties": {},
+      "position": {
+        "x": 372.0,
+        "y": -354.0
+      },
+      "size": {
+        "w": 360.0,
+        "h": 220.0
+      },
+      "inputs": [
+        "data"
+      ],
+      "outputs": []
+    },
+    {
+      "id": "node_2310434798784",
+      "type": "save_dataframe",
+      "title": "Save DataFrame",
+      "properties": {
+        "output_path": "",
+        "file_type": "auto",
+        "overwrite": true,
+        "include_index": false
+      },
+      "position": {
+        "x": 405.0,
+        "y": 25.0
+      },
+      "size": {
+        "w": 320.0,
+        "h": 140.0
+      },
+      "inputs": [
+        "data"
+      ],
+      "outputs": [
+        "saved_file"
+      ]
+    },
+    {
+      "id": "node_2310434668672",
+      "type": "filter_rows",
+      "title": "Filter Rows",
+      "properties": {
+        "filter_key": "",
+        "operator": "equals",
+        "value": "",
+        "auto_refresh_preview": true
+      },
+      "position": {
+        "x": -452.0,
+        "y": -183.0
+      },
+      "size": {
+        "w": 560.0,
+        "h": 280.0
+      },
+      "inputs": [
+        "data"
+      ],
+      "outputs": [
+        "data"
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "conn_2308645749632",
+      "source_node": "node_2310536612480",
+      "source_port": "file",
+      "target_node": "node_2310434920960",
+      "target_port": "file",
+      "label": "file"
+    },
+    {
+      "id": "conn_2310536749312",
+      "source_node": "node_2310434920960",
+      "source_port": "data",
+      "target_node": "node_2310434668672",
+      "target_port": "data",
+      "label": "data"
+    },
+    {
+      "id": "conn_2310536141696",
+      "source_node": "node_2310434668672",
+      "source_port": "data",
+      "target_node": "node_2310536744000",
+      "target_port": "data",
+      "label": "data"
+    },
+    {
+      "id": "conn_2310434386816",
+      "source_node": "node_2310434668672",
+      "source_port": "data",
+      "target_node": "node_2310434798784",
+      "target_port": "data",
+      "label": "data"
+    }
+  ],
+  "metadata": {
+    "version": "1.0",
+    "created_with": "Vera"
+  }
+}

@@ -1,0 +1,19 @@
+REMARK  Name = C:\Users\arifm\AppData\Local\Temp\bioshift_sztjjrcm\save_molecule\tmp_for_pdbqt.pdb
+REMARK  1 active torsions:
+REMARK  status: ('A' for Active; 'I' for Inactive)
+REMARK    1  A    between atoms: C1_2  and  C7_8
+REMARK                            x       y       z     vdW  Elec       q    Type
+REMARK                         _______ _______ _______ _____ _____    ______ ____
+ROOT
+ATOM      1  C1  UNL     1       0.874   0.015  -0.025  0.00  0.00    +0.000 A 
+ATOM      2  C2  UNL     1       0.201  -1.210  -0.056  0.00  0.00    +0.000 A 
+ATOM      3  C3  UNL     1       0.159   1.214   0.046  0.00  0.00    +0.000 A 
+ATOM      4  C4  UNL     1      -1.194  -1.231  -0.016  0.00  0.00    +0.000 A 
+ATOM      5  C5  UNL     1      -1.236   1.186   0.086  0.00  0.00    +0.000 A 
+ATOM      6  C6  UNL     1      -1.910  -0.035   0.055  0.00  0.00    +0.000 A 
+ENDROOT
+BRANCH   1   8
+ATOM      7  O1  UNL     1       2.993   1.074  -0.043  0.00  0.00    +0.000 OA
+ATOM      8  C7  UNL     1       2.349   0.032  -0.068  0.00  0.00    +0.000 C 
+ENDBRANCH   1   8
+TORSDOF 1

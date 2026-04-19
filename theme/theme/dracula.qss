@@ -1,0 +1,32 @@
+/* Dracula theme */
+
+QWidget { background: #282A36; color: #F8F8F2; selection-background-color: rgba(189,147,249,0.20); selection-color: #F8F8F2; }
+QMenuBar, QToolBar, QStatusBar { background: #2F3241; border: none; }
+QMenuBar { border-bottom: 1px solid #424657; }
+QMenuBar::item { padding: 6px 10px; }
+QMenuBar::item:selected { background: #3A3D4E; border-radius: 6px; }
+
+QMenu { background: #2F3241; border: 1px solid #424657; padding: 6px; }
+QMenu::item { padding: 6px 12px; border-radius: 4px; }
+QMenu::item:selected { background: #3A3D4E; }
+
+QPushButton { background: #2F3241; color: #F8F8F2; border: 1px solid #424657; border-radius: 8px; padding: 6px 12px; }
+QPushButton:hover { background: #3A3D4E; border-color: rgba(189,147,249,0.35); }
+QPushButton:default { background: #BD93F9; color: #171821; border: 1px solid #BD93F9; }
+
+QLineEdit, QPlainTextEdit, QTextEdit, QComboBox, QSpinBox, QDoubleSpinBox {
+  background: #2F3241; border: 1px solid #424657; border-radius: 8px; padding: 6px 8px; }
+QLineEdit:focus, QPlainTextEdit:focus, QTextEdit:focus, QComboBox:focus, QSpinBox:focus, QDoubleSpinBox:focus { border-color: #BD93F9; }
+
+QTabWidget::pane { border: 1px solid #424657; border-radius: 8px; top: -1px; background: #2F3241; }
+QTabBar::tab { padding: 6px 12px; border: 1px solid transparent; color: #F8F8F2; }
+QTabBar::tab:hover { background: #3A3D4E; border-color: #424657; }
+QTabBar::tab:selected { background: #2F3241; border-color: #424657; }
+
+QTreeView, QListView, QTableView, QTableWidget, QTreeWidget { background: #2F3241; border: 1px solid #424657; border-radius: 8px; alternate-background-color: #2C2F3C; }
+QHeaderView::section { background: #3A3D4E; border: 1px solid #424657; padding: 6px 8px; color: #E2E2DC; }
+
+QProgressBar { border: 1px solid #424657; border-radius: 8px; text-align: center; background: #3A3D4E; }
+QProgressBar::chunk { background: #BD93F9; border-radius: 8px; }
+
+

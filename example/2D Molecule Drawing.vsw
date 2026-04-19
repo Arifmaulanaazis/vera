@@ -1,0 +1,171 @@
+{
+  "nodes": [
+    {
+      "id": "node_2310434264704",
+      "type": "structure_draw_2d",
+      "title": "2D Structure Draw",
+      "properties": {
+        "background": "#ffffff",
+        "cell_width": 300,
+        "cell_height": 300,
+        "mode": "auto",
+        "grid_cols": 4,
+        "kekulize": true,
+        "atom_indices": false,
+        "max_mols": 25,
+        "prefer_coordgen": true,
+        "skip_large_molecules": true,
+        "max_atoms": 200,
+        "max_total_pixels": 4000000,
+        "use_text_placeholder_for_bondless": true
+      },
+      "position": {
+        "x": -327.0,
+        "y": -43.0
+      },
+      "size": {
+        "w": 200.0,
+        "h": 100.0
+      },
+      "inputs": [
+        "molecules",
+        "smiles_df",
+        "smiles"
+      ],
+      "outputs": [
+        "image",
+        "bytes"
+      ]
+    },
+    {
+      "id": "node_2310535990848",
+      "type": "mol_reader_auto",
+      "title": "Molecule Reader (Auto)",
+      "properties": {
+        "file_paths": ""
+      },
+      "position": {
+        "x": -663.0,
+        "y": -171.0
+      },
+      "size": {
+        "w": 200.0,
+        "h": 100.0
+      },
+      "inputs": [
+        "files",
+        "file"
+      ],
+      "outputs": [
+        "molecules"
+      ]
+    },
+    {
+      "id": "node_2310535991296",
+      "type": "file_input",
+      "title": "File Input",
+      "properties": {
+        "file_paths": ""
+      },
+      "position": {
+        "x": -1019.0,
+        "y": -211.0
+      },
+      "size": {
+        "w": 260.0,
+        "h": 120.0
+      },
+      "inputs": [],
+      "outputs": [
+        "files",
+        "file",
+        "file_paths"
+      ]
+    },
+    {
+      "id": "node_2310535949952",
+      "type": "image_view",
+      "title": "Image View",
+      "properties": {
+        "auto_scale": true
+      },
+      "position": {
+        "x": 81.0,
+        "y": -318.0
+      },
+      "size": {
+        "w": 300.0,
+        "h": 250.0
+      },
+      "inputs": [
+        "image",
+        "bytes"
+      ],
+      "outputs": []
+    },
+    {
+      "id": "node_2310435144640",
+      "type": "save_file",
+      "title": "Save File",
+      "properties": {
+        "output_path": "",
+        "file_type": "auto",
+        "overwrite": true
+      },
+      "position": {
+        "x": 67.0,
+        "y": 66.0
+      },
+      "size": {
+        "w": 320.0,
+        "h": 140.0
+      },
+      "inputs": [
+        "molecules",
+        "bytes",
+        "image",
+        "string",
+        "data"
+      ],
+      "outputs": []
+    }
+  ],
+  "connections": [
+    {
+      "id": "conn_2310535840192",
+      "source_node": "node_2310535990848",
+      "source_port": "molecules",
+      "target_node": "node_2310434264704",
+      "target_port": "molecules",
+      "label": "molecules"
+    },
+    {
+      "id": "conn_2310434274560",
+      "source_node": "node_2310535991296",
+      "source_port": "file",
+      "target_node": "node_2310535990848",
+      "target_port": "file",
+      "label": "file"
+    },
+    {
+      "id": "conn_2310012981248",
+      "source_node": "node_2310434264704",
+      "source_port": "image",
+      "target_node": "node_2310535949952",
+      "target_port": "image",
+      "label": "image"
+    },
+    {
+      "id": "conn_2310434274112",
+      "source_node": "node_2310434264704",
+      "source_port": "bytes",
+      "target_node": "node_2310435144640",
+      "target_port": "bytes",
+      "label": "bytes"
+    }
+  ],
+  "metadata": {
+    "version": "1.0",
+    "created_with": "Vera"
+  }
+}

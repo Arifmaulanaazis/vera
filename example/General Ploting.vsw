@@ -1,0 +1,504 @@
+{
+  "nodes": [
+    {
+      "id": "node_2308648665984",
+      "type": "file_input",
+      "title": "File Input",
+      "properties": {
+        "file_paths": ""
+      },
+      "position": {
+        "x": -300.46103368808326,
+        "y": 134.07026204408493
+      },
+      "size": {
+        "w": 260.0,
+        "h": 120.0
+      },
+      "inputs": [],
+      "outputs": [
+        "files",
+        "file",
+        "file_paths"
+      ]
+    },
+    {
+      "id": "node_2308651370880",
+      "type": "excel_reader",
+      "title": "Excel Reader",
+      "properties": {
+        "file_paths": "",
+        "sheet": "",
+        "header": true,
+        "engine": "auto"
+      },
+      "position": {
+        "x": 122.09970293300597,
+        "y": 292.08164231032794
+      },
+      "size": {
+        "w": 200.0,
+        "h": 100.0
+      },
+      "inputs": [
+        "files",
+        "file"
+      ],
+      "outputs": [
+        "data"
+      ]
+    },
+    {
+      "id": "node_2308661665344",
+      "type": "plot_bar",
+      "title": "Bar Plot",
+      "properties": {
+        "title": "Bar Plot",
+        "label_key": "",
+        "value_key": ""
+      },
+      "position": {
+        "x": 555.4339427540662,
+        "y": -383.0578915545284
+      },
+      "size": {
+        "w": 280.0,
+        "h": 160.0
+      },
+      "inputs": [
+        "categories",
+        "values",
+        "table"
+      ],
+      "outputs": [
+        "plot_image"
+      ]
+    },
+    {
+      "id": "node_2308651379840",
+      "type": "plot_donut",
+      "title": "Donut Chart",
+      "properties": {
+        "title": "Donut Chart",
+        "label_key": "",
+        "value_key": "",
+        "hole": 0.5
+      },
+      "position": {
+        "x": 553.0398309318505,
+        "y": 257.36702088819874
+      },
+      "size": {
+        "w": 280.0,
+        "h": 160.0
+      },
+      "inputs": [
+        "labels",
+        "values",
+        "table"
+      ],
+      "outputs": [
+        "plot_image"
+      ]
+    },
+    {
+      "id": "node_2308662482880",
+      "type": "plot_heatmap",
+      "title": "Heatmap",
+      "properties": {
+        "title": "Heatmap"
+      },
+      "position": {
+        "x": 544.6604395540953,
+        "y": 866.6684796421205
+      },
+      "size": {
+        "w": 280.0,
+        "h": 160.0
+      },
+      "inputs": [
+        "matrix",
+        "table"
+      ],
+      "outputs": [
+        "plot_image"
+      ]
+    },
+    {
+      "id": "node_2308649221504",
+      "type": "plot_histogram",
+      "title": "Histogram",
+      "properties": {
+        "title": "Histogram",
+        "value_key": "",
+        "bins": 20
+      },
+      "position": {
+        "x": 555.4339427540663,
+        "y": 470.4429730654052
+      },
+      "size": {
+        "w": 280.0,
+        "h": 160.0
+      },
+      "inputs": [
+        "values",
+        "table"
+      ],
+      "outputs": [
+        "plot_image"
+      ]
+    },
+    {
+      "id": "node_2308661431552",
+      "type": "plot_line",
+      "title": "Line Plot",
+      "properties": {
+        "title": "Line Plot",
+        "x_key": "",
+        "y_key": ""
+      },
+      "position": {
+        "x": 550.6457191096347,
+        "y": 666.760142487101
+      },
+      "size": {
+        "w": 280.0,
+        "h": 160.0
+      },
+      "inputs": [
+        "x",
+        "y",
+        "table"
+      ],
+      "outputs": [
+        "plot_image"
+      ]
+    },
+    {
+      "id": "node_2308648723648",
+      "type": "plot_pie",
+      "title": "Pie Chart",
+      "properties": {
+        "title": "Pie Chart",
+        "label_key": "",
+        "value_key": ""
+      },
+      "position": {
+        "x": 557.8280545762819,
+        "y": -169.98193937732196
+      },
+      "size": {
+        "w": 280.0,
+        "h": 160.0
+      },
+      "inputs": [
+        "labels",
+        "values",
+        "table"
+      ],
+      "outputs": [
+        "plot_image"
+      ]
+    },
+    {
+      "id": "node_2308648666240",
+      "type": "plot_scatter",
+      "title": "Scatter",
+      "properties": {
+        "title": "Scatter",
+        "x_key": "",
+        "y_key": ""
+      },
+      "position": {
+        "x": 559.0251104873898,
+        "y": 44.29106871099236
+      },
+      "size": {
+        "w": 280.0,
+        "h": 160.0
+      },
+      "inputs": [
+        "x",
+        "y",
+        "table"
+      ],
+      "outputs": [
+        "plot_image"
+      ]
+    },
+    {
+      "id": "node_2308651376640",
+      "type": "image_view",
+      "title": "Image View",
+      "properties": {
+        "auto_scale": true
+      },
+      "position": {
+        "x": 1029.4680835527959,
+        "y": -507.5517063097501
+      },
+      "size": {
+        "w": 300.0,
+        "h": 250.0
+      },
+      "inputs": [
+        "image",
+        "bytes"
+      ],
+      "outputs": []
+    },
+    {
+      "id": "node_2308662596736",
+      "type": "image_view",
+      "title": "Image View",
+      "properties": {
+        "auto_scale": true
+      },
+      "position": {
+        "x": 1030.6651394639027,
+        "y": -213.0759521772064
+      },
+      "size": {
+        "w": 300.0,
+        "h": 250.0
+      },
+      "inputs": [
+        "image",
+        "bytes"
+      ],
+      "outputs": []
+    },
+    {
+      "id": "node_2308649208128",
+      "type": "image_view",
+      "title": "Image View",
+      "properties": {
+        "auto_scale": true
+      },
+      "position": {
+        "x": 1027.0739717305796,
+        "y": 74.2174664886899
+      },
+      "size": {
+        "w": 300.0,
+        "h": 250.0
+      },
+      "inputs": [
+        "image",
+        "bytes"
+      ],
+      "outputs": []
+    },
+    {
+      "id": "node_2308649288256",
+      "type": "image_view",
+      "title": "Image View",
+      "properties": {
+        "auto_scale": true
+      },
+      "position": {
+        "x": 1024.6798599083636,
+        "y": 362.70794106569406
+      },
+      "size": {
+        "w": 300.0,
+        "h": 250.0
+      },
+      "inputs": [
+        "image",
+        "bytes"
+      ],
+      "outputs": []
+    },
+    {
+      "id": "node_2308649175360",
+      "type": "image_view",
+      "title": "Image View",
+      "properties": {
+        "auto_scale": true
+      },
+      "position": {
+        "x": 1021.0886921750398,
+        "y": 657.1836951982377
+      },
+      "size": {
+        "w": 300.0,
+        "h": 250.0
+      },
+      "inputs": [
+        "image",
+        "bytes"
+      ],
+      "outputs": []
+    },
+    {
+      "id": "node_2308646605952",
+      "type": "image_view",
+      "title": "Image View",
+      "properties": {
+        "auto_scale": true
+      },
+      "position": {
+        "x": 1021.0886921750398,
+        "y": 946.8712256863499
+      },
+      "size": {
+        "w": 300.0,
+        "h": 250.0
+      },
+      "inputs": [
+        "image",
+        "bytes"
+      ],
+      "outputs": []
+    },
+    {
+      "id": "node_2308651373184",
+      "type": "image_view",
+      "title": "Image View",
+      "properties": {
+        "auto_scale": true
+      },
+      "position": {
+        "x": 1025.8769158194716,
+        "y": 1235.3617002633541
+      },
+      "size": {
+        "w": 300.0,
+        "h": 250.0
+      },
+      "inputs": [
+        "image",
+        "bytes"
+      ],
+      "outputs": []
+    }
+  ],
+  "connections": [
+    {
+      "id": "conn_2308662493120",
+      "source_node": "node_2308648665984",
+      "source_port": "file",
+      "target_node": "node_2308651370880",
+      "target_port": "file",
+      "label": "file"
+    },
+    {
+      "id": "conn_2310435289600",
+      "source_node": "node_2308651370880",
+      "source_port": "data",
+      "target_node": "node_2308661665344",
+      "target_port": "table",
+      "label": "data"
+    },
+    {
+      "id": "conn_2308659471552",
+      "source_node": "node_2308651370880",
+      "source_port": "data",
+      "target_node": "node_2308648723648",
+      "target_port": "table",
+      "label": "data"
+    },
+    {
+      "id": "conn_2308649179904",
+      "source_node": "node_2308651370880",
+      "source_port": "data",
+      "target_node": "node_2308648666240",
+      "target_port": "table",
+      "label": "data"
+    },
+    {
+      "id": "conn_2308649294144",
+      "source_node": "node_2308651370880",
+      "source_port": "data",
+      "target_node": "node_2308651379840",
+      "target_port": "table",
+      "label": "data"
+    },
+    {
+      "id": "conn_2308662596288",
+      "source_node": "node_2308651370880",
+      "source_port": "data",
+      "target_node": "node_2308649221504",
+      "target_port": "table",
+      "label": "data"
+    },
+    {
+      "id": "conn_2308646144576",
+      "source_node": "node_2308651370880",
+      "source_port": "data",
+      "target_node": "node_2308661431552",
+      "target_port": "table",
+      "label": "data"
+    },
+    {
+      "id": "conn_2310536565376",
+      "source_node": "node_2308651370880",
+      "source_port": "data",
+      "target_node": "node_2308662482880",
+      "target_port": "table",
+      "label": "data"
+    },
+    {
+      "id": "conn_2308662438592",
+      "source_node": "node_2308661665344",
+      "source_port": "plot_image",
+      "target_node": "node_2308651376640",
+      "target_port": "image",
+      "label": "image"
+    },
+    {
+      "id": "conn_2308649175488",
+      "source_node": "node_2308648723648",
+      "source_port": "plot_image",
+      "target_node": "node_2308662596736",
+      "target_port": "image",
+      "label": "image"
+    },
+    {
+      "id": "conn_2308661662848",
+      "source_node": "node_2308648666240",
+      "source_port": "plot_image",
+      "target_node": "node_2308649208128",
+      "target_port": "image",
+      "label": "image"
+    },
+    {
+      "id": "conn_2308649364416",
+      "source_node": "node_2308651379840",
+      "source_port": "plot_image",
+      "target_node": "node_2308649288256",
+      "target_port": "image",
+      "label": "image"
+    },
+    {
+      "id": "conn_2308648373568",
+      "source_node": "node_2308649221504",
+      "source_port": "plot_image",
+      "target_node": "node_2308649175360",
+      "target_port": "image",
+      "label": "image"
+    },
+    {
+      "id": "conn_2308659263104",
+      "source_node": "node_2308661431552",
+      "source_port": "plot_image",
+      "target_node": "node_2308646605952",
+      "target_port": "image",
+      "label": "image"
+    },
+    {
+      "id": "conn_2308662490176",
+      "source_node": "node_2308662482880",
+      "source_port": "plot_image",
+      "target_node": "node_2308651373184",
+      "target_port": "image",
+      "label": "image"
+    }
+  ],
+  "metadata": {
+    "version": "1.0",
+    "created_with": "Vera"
+  }
+}

@@ -29,6 +29,9 @@ def _to_rows(data: Any) -> List[Dict[str, Any]]:
     try:
         import pandas as pd  # type: ignore
         if isinstance(data, pd.DataFrame):
+            # MultiIndex produces tuple keys in to_dict; flatten to plain columns first
+            if isinstance(data.index, pd.MultiIndex):
+                data = data.reset_index()
             return data.to_dict(orient="records")
     except Exception:
         pass
@@ -76,20 +79,24 @@ def _to_rows(data: Any) -> List[Dict[str, Any]]:
 
 
 def _coerce_number(value: Any) -> Tuple[bool, float]:
-    """Try to coerce value to float. Return (success, number)."""
+    """Try to coerce value to float. Return (success, number).
+
+    On failure returns (False, nan) — never 0.0 — so callers can
+    distinguish a coercion error from a legitimate zero value.
+    """
     try:
         if isinstance(value, bool):  # avoid True/False as 1/0 surprises
-            return False, 0.0
+            return False, float("nan")
         if isinstance(value, (int, float)):
             return True, float(value)
         if isinstance(value, str):
             v = value.strip()
             if v.lower() in {"nan", "inf", "-inf"}:
-                return False, 0.0
+                return False, float("nan")
             return True, float(v)
-        return False, 0.0
+        return False, float("nan")
     except Exception:
-        return False, 0.0
+        return False, float("nan")
 
 
 class SelectColumnsNode(BaseNode):
@@ -113,6 +120,17 @@ class SelectColumnsNode(BaseNode):
         self.set_property("available_columns", [])  # cached discovered columns
 
         # Inline UI: table preview on the left and checkbox panel on the right
+        try:
+            from core.nodes import BaseNode as _BaseNode
+            if getattr(_BaseNode, "_lightweight_construction", False):
+                self._table = None
+                self._schema_proxy = None
+                self._schema_widget = None
+                self._column_checkboxes = {}
+                return
+        except Exception:
+            pass
+
         from PySide6.QtWidgets import (
             QTableWidget,
             QGraphicsProxyWidget,

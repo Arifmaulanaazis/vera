@@ -110,6 +110,12 @@ class PythonScriptNode(BaseNode):
             raise RuntimeError(f"Script error: {e}") from e
 
         out: Dict[str, Any] = local_ns.get("output", {})
+        if not out:
+            self.logger.warning("PythonScriptNode: script did not populate the output dict")
+        elif "result" not in out and "result2" not in out:
+            self.logger.warning(
+                "PythonScriptNode: neither output['result'] nor output['result2'] was set"
+            )
         return {
             "result": out.get("result"),
             "result2": out.get("result2"),

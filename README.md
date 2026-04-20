@@ -133,7 +133,7 @@ When external tools require file-based input (e.g., Vina requires PDBQT), nodes 
 
 ## Node Library
 
-VERA ships with **106 built-in nodes** organized into **13 functional categories**:
+VERA ships with **112 built-in nodes** organized into **17 functional categories**:
 
 | Category | Nodes | Key Capabilities |
 |----------|:-----:|-------------------|
@@ -141,6 +141,8 @@ VERA ships with **106 built-in nodes** organized into **13 functional categories
 | **Batch Docking** | 1 | High-throughput AutoDock Vina batch virtual screening |
 | **Molecular Dynamics** | 10 | GROMACS minimization, equilibration, production, CHARMM-GUI, analysis, trajectory extraction |
 | **Molecular Preparation** | 3 | RDKit/OpenBabel minimization, ETKDG conformer generation |
+| **Molecular I/O** | 9 | SMILES input, SDF/MOL/MOL2/PDB/PDBQT/XYZ readers, molecule writer |
+| **Cheminformatics** | 3 | RDKit descriptors, molecular fingerprints (Morgan/MACCS/RDKit), SMARTS substructure filter |
 | **Data I/O** | 22 | SDF/MOL/MOL2/PDB/PDBQT/XYZ/CSV/Excel readers, writers, viewers, databases |
 | **Data Manipulation** | 6 | Column selection, row filtering, sorting, deduplication, merging |
 | **Machine Learning** | 8 | Train/test split, logistic regression, random forest, SVM, KNN, SVR |
@@ -150,6 +152,8 @@ VERA ships with **106 built-in nodes** organized into **13 functional categories
 | **Chromatography** | 6 | Time-series reader, smoothing, baseline correction, peak detection, integration |
 | **Response Surface** | 3 | DoE preparation, model fitting, 3D surface visualization |
 | **ML Model Mgmt** | 4 | Model save/load, testing, prediction |
+| **Scripting** | 1 | Custom Python script node (inline editor, access to all inputs/outputs) |
+| **Utilities** | 1 | Sticky note / comment node for workflow documentation |
 
 ### Molecular Docking
 
@@ -432,7 +436,6 @@ vera/
 │   ├── data_mod_nodes.py         # DataFrame manipulation nodes
 │   ├── visualization_nodes.py    # Plotting and 3D viewer nodes
 │   ├── ml_nodes.py               # Machine learning nodes (sklearn)
-│   ├── admet_nodes.py            # ADMET/toxicity prediction nodes
 │   └── ...                       # Other node modules by category
 │
 ├── UI/                           # Qt dialogs and UI components
@@ -559,10 +562,10 @@ vera/
 
 | Metric | Value |
 |--------|-------|
-| Total Python source files | ~35 |
-| Lines of code | ~25,000 |
-| Built-in node types | 106 |
-| Node categories | 13 |
+| Total Python source files | ~39 |
+| Lines of code | ~26,500 |
+| Built-in node types | 112 |
+| Node categories | 16 |
 | Port data types | 9 canonical + synonyms |
 | External engine integrations | 5 (Vina CPU, Vina GPU, GROMACS, OpenBabel, NGL.js) |
 | Web service integrations | 2 (PubChem, RCSB PDB) |

@@ -7,6 +7,32 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [1.1.1] — 2026-04-20
+
+### Fixed
+
+- **SelectColumnsNode**: missing `_lightweight_construction` guard in `__init__` caused Qt widget
+  creation to run in headless/validation mode → added guard that initialises all Qt attributes to
+  `None` and returns early when running without a display.
+- **StackedBarPlotNode**: calling `_finish_png()` without an active matplotlib figure when the
+  input table was `None` produced a `ValueError` from matplotlib → node now creates a blank
+  "No data" figure before saving so the output port always receives valid PNG bytes.
+- **PairPlotNode**: returning raw `b""` on missing data or seaborn error caused downstream
+  `image_view` nodes to crash on empty bytes → node now renders a "No data" / "Unable to render"
+  placeholder PNG in all error paths.
+- **`_to_rows()`** (`data_mod_nodes`): `DataFrame.to_dict(orient="records")` on a MultiIndex
+  DataFrame produced tuple column keys that downstream filter/select nodes could not match →
+  added `reset_index()` before conversion to flatten multi-level indices into plain columns.
+- **`_coerce_number()`** (`data_mod_nodes`): all failure paths returned `(False, 0.0)`, making it
+  impossible to distinguish a coercion error from a legitimate zero value → failure paths now
+  return `(False, float("nan"))` so callers that skip the boolean check cannot silently use `0.0`
+  as if it were a valid number.
+- **PythonScriptNode**: scripts that never wrote to `output` produced silent `None` results with
+  no indication of the problem → `execute()` now emits a logger warning when the script finishes
+  without populating `output["result"]` or `output["result2"]`.
+
+---
+
 ## [1.1.0] — 2026-04-20
 
 ### Added
@@ -143,5 +169,6 @@ PySide6 ≥ 6.6.0, RDKit ≥ 2023.9.1, ProLIF ≥ 2.0.0, scikit-learn ≥ 1.1.0,
 
 ---
 
-[1.1.0]: https://github.com/Arifmaulanaazis/vera/compare/v1.0.0...v1.1.0
-[1.0.0]: https://github.com/Arifmaulanaazis/vera/releases/tag/v1.0.0
+[1.1.1]: https://github.com/Arifmaulanaazis/vera/compare/1.1.0...1.1.1
+[1.1.0]: https://github.com/Arifmaulanaazis/vera/compare/1.0.0...1.1.0
+[1.0.0]: https://github.com/Arifmaulanaazis/vera/releases/tag/1.0.0

@@ -1,3 +1,63 @@
+##  v1.1.1 ( 2026-04-20)
+
+This patch release resolves six stability issues across node execution, data handling, and error reporting — improving robustness in headless environments, multi-index DataFrames, and error-path behaviors throughout the workflow engine.
+
+---
+
+##  Highlights
+
+*  **Headless/validation mode** compatibility fix for `SelectColumnsNode`
+*  **StackedBarPlotNode** and **PairPlotNode** now always produce valid PNG output
+*  Corrected silent data corruption in **`_coerce_number()`** zero-vs-error ambiguity
+*  **PythonScriptNode** now warns when a script finishes without populating `output`
+
+---
+
+##  Fixed
+
+###  Nodes
+
+* **SelectColumnsNode** (`select_columns`)
+  Missing `_lightweight_construction` guard in `__init__` caused Qt widget creation to run in headless/validation mode. All Qt attributes are now initialised to `None` and the constructor returns early when no display is available.
+
+---
+
+* **StackedBarPlotNode** (`plot_stacked_bar`)
+  Calling `_finish_png()` without an active matplotlib figure when the input table was `None` raised a `ValueError`. The node now creates a blank "No data" figure before saving so the output port always receives valid PNG bytes.
+
+---
+
+* **PairPlotNode** (`plot_pairplot`)
+  Returning raw `b""` on missing data or seaborn errors caused downstream `image_view` nodes to crash on empty bytes. All error paths now render a "No data" / "Unable to render" placeholder PNG instead.
+
+---
+
+###  Data Handling
+
+* **`_to_rows()`** (`data_mod_nodes`)
+  `DataFrame.to_dict(orient="records")` on a MultiIndex DataFrame produced tuple column keys that downstream filter and select nodes could not match. A `reset_index()` call is now applied before conversion to flatten multi-level indices into plain columns.
+
+* **`_coerce_number()`** (`data_mod_nodes`)
+  All failure paths previously returned `(False, 0.0)`, making it impossible to distinguish a coercion error from a legitimate zero value. Failure paths now return `(False, float("nan"))` so callers that skip the boolean check cannot silently treat `0.0` as a valid number.
+
+---
+
+###  Scripting
+
+* **PythonScriptNode** (`python_script`)
+  Scripts that never wrote to `output` produced silent `None` results with no indication of the problem. `execute()` now emits a logger warning when the script finishes without populating `output["result"]` or `output["result2"]`.
+
+---
+
+##  Release Summary
+
+* **6 bug fixes across nodes, data handling, and scripting**
+* Improved stability in headless and validation-mode environments
+* Eliminated silent data corruption in number coercion
+* All plot nodes now guarantee valid PNG output on error paths
+
+---
+
 ##  v1.1.0 ( 2026-04-20)
 
 This release delivers a significant expansion of VERA’s capabilities with the introduction of a dedicated **Cheminformatics toolkit**, integrated **Python scripting**, and new **workflow utilities**. These additions enable more flexible molecular analysis, custom logic execution, and improved workflow documentation directly within the canvas.

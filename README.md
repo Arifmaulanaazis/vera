@@ -18,6 +18,12 @@
 
 ---
 
+<p align="center">
+  <img src="preview.gif" alt="VERA Preview" width="100%">
+</p>
+
+---
+
 ## Abstract
 
 VERA (Virtual Execution and Reaction Architecture) is an open-source visual workflow platform engineered for computational chemistry, molecular modeling, and bioinformatics research. Built on a directed acyclic graph (DAG) execution paradigm using Python 3.13 and PySide6 (Qt6), VERA provides **106 specialized processing nodes** organized across **13 functional categories**, covering the complete *in silico* drug discovery pipeline from molecular input and preparation through structure-based virtual screening, molecular dynamics simulation, machine learning, and publication-quality visualization.

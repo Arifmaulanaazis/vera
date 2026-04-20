@@ -314,6 +314,40 @@ class NodeFactory:
         except ImportError:
             pass
 
+        # SMILES Input (io_nodes)
+        try:
+            from nodes.io_nodes import SMILESInputNode
+            self.register_node("smiles_input", SMILESInputNode)
+        except ImportError:
+            pass
+
+        # Cheminformatics: Descriptor, Fingerprint, SMARTS Filter
+        try:
+            from nodes.chem_nodes import (
+                MolDescriptorNode,
+                MolFingerprintNode,
+                SMARTSFilterNode,
+            )
+            self.register_node("mol_descriptor", MolDescriptorNode)
+            self.register_node("mol_fingerprint", MolFingerprintNode)
+            self.register_node("smarts_filter", SMARTSFilterNode)
+        except ImportError:
+            pass
+
+        # Python Script
+        try:
+            from nodes.script_nodes import PythonScriptNode
+            self.register_node("python_script", PythonScriptNode)
+        except ImportError:
+            pass
+
+        # Utility: Note / Sticky Note
+        try:
+            from nodes.utility_nodes import NoteNode
+            self.register_node("note", NoteNode)
+        except ImportError:
+            pass
+
         # Finally, discover and load user plugins
         try:
             from backend.plugin_manager import load_plugins_into_factory

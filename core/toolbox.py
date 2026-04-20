@@ -830,6 +830,7 @@ class NodeToolbox(QWidget):
 
         # I/O - Molecular readers
         def add_io_molecular(cat: NodeCategoryWidget):
+            cat.add_node("smiles_input", "SMILES Input", "Type SMILES strings to generate molecules")
             cat.add_node("mol_reader_auto", "Auto Mol Reader", "Read SDF/MOL/MOL2/PDB/PDBQT/XYZ automatically")
             cat.add_node("sdf_reader", "SDF Reader", "Read SDF file → molecules")
             cat.add_node("mol_reader", "MOL Reader", "Read MOL file → molecules")
@@ -899,6 +900,26 @@ class NodeToolbox(QWidget):
             cat.add_node("ml_model_predict", "Model Predict", "Batch prediction for dataset")
 
         self._add_category("ML Model Management", add_ml_models)
+
+        # Cheminformatics
+        def add_chem(cat: NodeCategoryWidget):
+            cat.add_node("mol_descriptor", "Mol Descriptor", "Calculate RDKit molecular descriptors (Lipinski, all, etc.)")
+            cat.add_node("mol_fingerprint", "Mol Fingerprint", "Generate molecular fingerprints (Morgan, MACCS, RDKit, etc.)")
+            cat.add_node("smarts_filter", "SMARTS Filter", "Filter molecules by SMARTS substructure pattern")
+
+        self._add_category("Cheminformatics", add_chem)
+
+        # Scripting
+        def add_script(cat: NodeCategoryWidget):
+            cat.add_node("python_script", "Python Script", "Execute custom Python code in the workflow")
+
+        self._add_category("Scripting", add_script)
+
+        # Utilities
+        def add_utils(cat: NodeCategoryWidget):
+            cat.add_node("note", "Note", "Sticky note / comment on the canvas")
+
+        self._add_category("Utilities", add_utils)
 
         # Plugin-provided categories
         try:

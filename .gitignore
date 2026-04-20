@@ -130,6 +130,7 @@ Thumbs.db
 # Compiled Qt resources
 assets/vera_resources.py
 assets/resource_manifest.json
+assets/vera_resources.qrc
 
 # Temporary files
 *.tmp

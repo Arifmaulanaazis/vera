@@ -31,7 +31,7 @@ VERA (Virtual Execution and Reaction Architecture) is an open-source visual work
 The platform implements a formally defined **type-safe port system** with 9 canonical data types and automatic compatibility checking, a **thread-safe asynchronous workflow execution engine** with real-time per-node progress monitoring and subprocess lifecycle management, **atomic workflow serialization** to a JSON-based format (`.vsw`), and a **plugin architecture** enabling community-driven extension of the node library.
 
 > **Citation:** If you use VERA in your research, please cite our paper:
-> Azis, A.M. (2026). *VERA: A Visual Node-Based Workflow Platform for Integrated Computational Chemistry and Bioinformatics.* arXiv preprint.
+> Azis, A.M. (2026). *VERA: A Visual Node-Based Workflow Platform for Integrated Computational Chemistry and Bioinformatics.* ChemRxiv preprint.
 
 ---
 
@@ -339,7 +339,7 @@ python build_resources.py
 #### 6. Launch VERA
 
 ```bash
-python main.py
+python vera.py
 ```
 
 ---

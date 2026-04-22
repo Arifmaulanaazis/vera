@@ -20,14 +20,14 @@ separate PR:
 
 | Action | Documents to update |
 |--------|---------------------|
-| Add a new node | `CHANGELOG.md`, `README.md` (node table, Tech Specs), `core/toolbox.py` |
-| Remove a node | `CHANGELOG.md`, `README.md`, `core/toolbox.py`, `nodes/node_factory.py` |
+| Add a new node | `CHANGELOG.md`, `README.md` (node table, Tech Specs), `core/toolbox.py`, `tests/` (new test class) |
+| Remove a node | `CHANGELOG.md`, `README.md`, `core/toolbox.py`, `nodes/node_factory.py`, `tests/` (remove its test class) |
 | Add a new toolbox category | `CHANGELOG.md`, `README.md` (category table, Tech Specs) |
 | Add a new file or module | `CHANGELOG.md`, `README.md` (Project Structure, if relevant) |
 | Fix a bug | `CHANGELOG.md` (section `### Fixed`) |
 | Change node or engine behavior | `CHANGELOG.md` (section `### Changed`) |
 | Remove a feature or file | `CHANGELOG.md` (section `### Removed`), `README.md` |
-| Bump a dependency | `CHANGELOG.md`, `README.md` (Dependencies table) |
+| Bump a dependency | `CHANGELOG.md`, `README.md` (Dependencies table), `requirements.txt` |
 | Bump application version | `CHANGELOG.md`, `core/app_control.py` |
 
 ---
@@ -135,6 +135,12 @@ Every new node must satisfy this checklist before it is considered complete.
 - [ ] Registered in `nodes/node_factory.py` inside a `try/except ImportError` block
 - [ ] Added to the correct category in `core/toolbox.py` via `cat.add_node()`
 
+### Testing
+
+- [ ] Test class added in `tests/test_<module>.py` following the pattern in `CONTRIBUTING.md`
+- [ ] At minimum: happy path, empty input, missing input raises `ValueError`, one edge case
+- [ ] `python -m pytest tests/ -v` passes with **zero failures** (baseline: 308 tests)
+
 ### Documentation
 
 - [ ] Entry added to `CHANGELOG.md` with a new version number
@@ -165,6 +171,60 @@ Every new node must satisfy this checklist before it is considered complete.
    ```
 4. Bump the `PATCH` version, unless the fix also includes a new feature
    (in which case bump `MINOR`).
+
+---
+
+## Testing Standards
+
+VERA uses **pytest** with the Qt offscreen platform so tests run headless.
+
+### Running Tests
+
+```bash
+python -m pytest tests/ -v
+```
+
+All tests must pass before a PR is merged. The expected baseline is **308 passed**.
+
+### Test File Map
+
+| Node module | Test file |
+|---|---|
+| `core/port_types.py` | `tests/test_port_types.py` |
+| `nodes/data_mod_nodes.py` (helpers) | `tests/test_data_mod_helpers.py` |
+| `nodes/data_mod_nodes.py` (nodes) | `tests/test_data_mod_nodes.py` |
+| `nodes/script_nodes.py` | `tests/test_script_nodes.py` |
+| `nodes/plot_nodes.py` (helpers) | `tests/test_plot_helpers.py` |
+| `nodes/plot_nodes.py` (nodes) | `tests/test_plot_nodes.py` |
+| `nodes/chem_nodes.py` | `tests/test_chem_nodes.py` |
+| `nodes/ml_nodes.py` | `tests/test_ml_nodes.py` |
+| `nodes/utility_nodes.py` | `tests/test_utility_nodes.py` |
+| `nodes/io_nodes.py` (helpers) | `tests/test_io_helpers.py` |
+
+When adding a node to an existing module, add the test class to the corresponding test file.
+When adding a **new module**, create `tests/test_<module_name>.py`.
+
+### Fixture Rules
+
+- Use the **`lightweight`** fixture for nodes that check `BaseNode._lightweight_construction` in their `__init__` (e.g., `SelectColumnsNode`, `PythonScriptNode`). This skips all Qt inline widget construction and only exercises `execute()`.
+- Use the **`qapp`** fixture for nodes that unconditionally construct Qt widgets in `__init__` (e.g., `FilterRowsNode`, `SortRowsNode`). A real `QApplication` is required, but `QT_QPA_PLATFORM=offscreen` prevents any window from appearing.
+- Never use both `qapp` and `lightweight` on the same test — `lightweight` already implies `qapp`.
+
+### What to Test
+
+Every node test class must cover:
+
+1. **Happy path** — valid, representative inputs produce the expected output.
+2. **Empty data** — `execute({"data": []})` returns an empty result (not an exception).
+3. **Missing required input** — `execute({})` raises `ValueError`.
+4. **At least one edge case** specific to the node's logic (boundary value, operator variant, format alias, etc.).
+
+Do **not** test Qt widget state (checked boxes, table row counts, etc.) — those belong to manual testing. Focus on the `execute()` return value and `validate()` return value.
+
+### Naming Convention
+
+- Test class: `TestMyNodeName` (matches the node class name with `Test` prefix).
+- Test method: `test_<scenario_in_snake_case>` — describe the *scenario*, not the *assertion*.
 
 ---
 

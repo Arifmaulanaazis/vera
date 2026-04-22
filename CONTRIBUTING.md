@@ -487,17 +487,30 @@ The `_register()` method will index the node by `NODE_TYPE` and make it discover
 
 Create a minimal `.vsw` file in `example/` that demonstrates your node in a realistic workflow. Open it in VERA, wire it up, run it successfully, then use **File → Save Workflow** to export the `.vsw` file.
 
-### 6. Checklist Before Submitting
+### 6. Add Tests
+
+Add a test class for the new node following the guide in the [Testing](#testing) section. At minimum, cover:
+
+- Happy path with valid inputs
+- Empty / `None` input behaviour
+- Missing required input raises `ValueError`
+- At least one edge case specific to the node's logic
+
+Run `python -m pytest tests/ -v` and confirm all tests pass before opening the PR.
+
+### 7. Checklist Before Submitting
 
 - [ ] Node subclasses `BaseNode` correctly
-- [ ] `NODE_TYPE` is globally unique (search the codebase to confirm)
-- [ ] `NODE_CATEGORY` matches an existing toolbox category or a new one is justified
+- [ ] `node_type` is globally unique (search the codebase to confirm)
+- [ ] Category matches an existing toolbox category or a new one is justified
 - [ ] All ports use canonical types
-- [ ] `run()` raises descriptive `ValueError` for invalid inputs
+- [ ] `execute()` raises descriptive `ValueError` for invalid inputs
 - [ ] Node handles `None` inputs gracefully
+- [ ] `_lightweight_construction` guard present if node creates Qt widgets in `__init__`
 - [ ] External tools (Vina, GROMACS) are called via `subprocess` with proper error handling
 - [ ] Temporary files are written to the workspace directory and cleaned up
 - [ ] Node is registered in `NodeFactory`
+- [ ] Test class added in the appropriate `tests/` file, all 308+ tests pass
 - [ ] Example `.vsw` workflow is included
 
 ---
@@ -550,15 +563,105 @@ Use the `web/` branch prefix for all landing page branches (e.g., `web/fix-mobil
 
 ## Testing
 
-VERA does not currently have an automated test suite. Testing is performed manually.
+VERA has an automated pytest suite in `tests/`. All contributions **must** pass the existing suite and, for new nodes, include new tests before a PR can be merged.
 
-**When contributing a new node or bug fix, test the following:**
+### Running the Suite
 
-1. **Happy path:** Run the node with valid inputs in a complete workflow and verify the output is correct.
-2. **Edge cases:** Test with empty inputs, `None` values, and boundary values for numeric parameters.
-3. **Error propagation:** Confirm that invalid inputs raise a `ValueError` with a clear message visible in the VERA console panel.
-4. **Workflow serialization:** Save a workflow containing your node as a `.vsw` file, close VERA, reopen it, load the workflow, and confirm all node parameters were preserved correctly.
-5. **Type compatibility:** Attempt to connect incompatible port types in the canvas and confirm VERA rejects the connection.
+```bash
+# Install dev dependencies (one-time)
+pip install pytest pytest-qt
+
+# Run all tests
+python -m pytest tests/ -v
+
+# Run a specific file
+python -m pytest tests/test_data_mod_nodes.py -v
+```
+
+Tests run fully headless — no display is required. Expected result: **308 tests pass**.
+
+### How Tests Work
+
+The test suite in `tests/` uses two key fixtures defined in `tests/conftest.py`:
+
+- **`qapp`** (session-scoped) — creates a single `QApplication` with `QT_QPA_PLATFORM=offscreen` so Qt widget construction works without a real display.
+- **`lightweight`** — sets `BaseNode._lightweight_construction = True` for the duration of a test, preventing nodes from building their inline Qt widgets (table views, script editors, floating panels). Only the computation logic in `execute()` is exercised.
+
+### Writing Tests for a New Node
+
+Every new node submitted in a PR **must** include a corresponding test class in the appropriate test file.
+
+#### Step 1 — Choose or create the test file
+
+| Node file | Test file |
+|---|---|
+| `nodes/data_mod_nodes.py` | `tests/test_data_mod_nodes.py` |
+| `nodes/script_nodes.py` | `tests/test_script_nodes.py` |
+| `nodes/plot_nodes.py` | `tests/test_plot_nodes.py` |
+| `nodes/chem_nodes.py` | `tests/test_chem_nodes.py` |
+| `nodes/ml_nodes.py` | `tests/test_ml_nodes.py` |
+| `nodes/utility_nodes.py` | `tests/test_utility_nodes.py` |
+| `nodes/io_nodes.py` (helpers) | `tests/test_io_helpers.py` |
+| Any new module | create `tests/test_<module_name>.py` |
+
+#### Step 2 — Write the test class
+
+Follow this pattern for any node whose `__init__` supports `_lightweight_construction`:
+
+```python
+class TestMyNewNode:
+    @pytest.fixture(autouse=True)
+    def setup(self, lightweight):            # use `lightweight` if the node checks the flag
+        from nodes.my_module import MyNewNode
+        self.node = MyNewNode()
+
+    def test_happy_path(self):
+        result = self.node.execute({"data": [{"col": 1}, {"col": 2}]})
+        assert result["output_port"] == expected_value
+
+    def test_empty_input_returns_empty(self):
+        result = self.node.execute({"data": []})
+        assert result["output_port"] == []
+
+    def test_missing_input_raises(self):
+        with pytest.raises(ValueError):
+            self.node.execute({})
+```
+
+For nodes that **do not** check `_lightweight_construction` (they always build Qt widgets), use the `qapp` fixture instead:
+
+```python
+class TestMyWidgetNode:
+    @pytest.fixture(autouse=True)
+    def setup(self, qapp):                   # use `qapp` for nodes with unconditional Qt setup
+        from nodes.my_module import MyWidgetNode
+        self.node = MyWidgetNode()
+```
+
+#### Step 3 — Minimum test cases per node
+
+Every node test class must cover at minimum:
+
+1. **Happy path** — valid inputs produce the expected output.
+2. **Empty input** — empty list / `None` input returns empty result or raises cleanly.
+3. **Missing required input** — `execute({})` raises `ValueError` (if the node requires inputs).
+4. **Edge case** — at least one boundary condition specific to the node's logic (e.g., filter that matches nothing, sort with one row, slice beyond bounds).
+
+#### Step 4 — Run the suite before opening the PR
+
+```bash
+python -m pytest tests/ -v
+```
+
+All tests — old and new — must pass.
+
+### Manual Testing Checklist
+
+In addition to automated tests, verify the following manually in the VERA application:
+
+1. **Happy path in a workflow** — run the node with valid inputs and confirm the output is correct.
+2. **Workflow serialization** — save a `.vsw` file containing the node, reload it, and confirm all parameters are preserved.
+3. **Type compatibility** — confirm VERA rejects connections between incompatible port types.
 
 ---
 

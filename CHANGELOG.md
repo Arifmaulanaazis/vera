@@ -7,7 +7,24 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
-## [1.1.1] — 2026-04-20
+## [1.1.1] — 2026-04-22
+
+### Added
+
+- **Expanded automated test suite** (`tests/`) — **308 pytest tests** covering the complete node library including cheminformatics, machine learning, utility nodes, and I/O helper functions. Tests run fully headless via the Qt offscreen platform — no display required. All tests use real library objects (genuine RDKit molecules from SMILES, real sklearn estimators, real pandas DataFrames) — no mocking.
+  - `tests/conftest.py` — session-scoped `QApplication` (offscreen) and `lightweight` fixture that sets `BaseNode._lightweight_construction = True` to skip inline widget creation during tests.
+  - `tests/test_port_types.py` — `normalize_type`, `is_compatible`, `compatibility_message`.
+  - `tests/test_data_mod_helpers.py` — `_to_rows`, `_coerce_number`.
+  - `tests/test_data_mod_nodes.py` — `SelectColumnsNode`, `FilterRowsNode`, `SliceRowsNode`, `DropDuplicatesNode`, `SortRowsNode`, `DataframeMergeNode`.
+  - `tests/test_script_nodes.py` — `PythonScriptNode` (`execute()` + `validate()`).
+  - `tests/test_plot_helpers.py` — `_as_numeric_list`, `_as_dataframe`, `_extract_series_from_table`, `_extract_labels_from_table`.
+  - `tests/test_plot_nodes.py` — `HistogramPlotNode`, `ScatterPlotNode`, `LinePlotNode`, `BarPlotNode`, `PiePlotNode`, `HeatmapPlotNode` (PNG-output smoke tests).
+  - `tests/test_chem_nodes.py` *(new)* — `MolDescriptorNode` (all 4 presets: lipinski, physicochemical, all, custom), `MolFingerprintNode` (Morgan, MACCS, RDKit fingerprints; runtime guard for fingerprint types absent in the installed RDKit build), `SMARTSFilterNode` (matched/unmatched routing, validate, invalid SMARTS detection). Uses real RDKit molecules constructed from SMILES.
+  - `tests/test_ml_nodes.py` *(new)* — `MLTrainTestSplitNode`; all 7 estimator nodes (`LogisticRegressionNode`, `RandomForestClassifierNode`, `SVMClassifierNode`, `KNNClassifierNode`, `LinearRegressionNode`, `RandomForestRegressorNode`, `SVRNode`); module-level helpers (`_is_dataframe`, `_to_dataframe`, `_numeric_columns_of`). Uses real sklearn + pandas — no mocking.
+  - `tests/test_utility_nodes.py` *(new)* — `NoteNode`: `execute()` (always returns `{}`), `validate()` (always passes), `set_property()`, color key helpers (`_bg_color`, `_border_color`, `_text_color`), port count assertions.
+  - `tests/test_io_helpers.py` *(new)* — `_as_path_list` (list, semicolon/comma/newline-separated strings, deduplication, `pathlib.Path` objects, non-existent path filtering), `_validate_xyz_format` (valid/invalid XYZ formats), `_parse_xyz_molecule` (real RDKit parse, atom count, 3D conformer coordinates), `_create_xyz_content` (atom count line, comment line, coordinate formatting).
+- `pytest.ini` — project-level pytest configuration (`testpaths = tests`, `-v --tb=short`).
+- `pytest==9.0.3` and `pytest-qt==4.5.0` added to `requirements.txt` under a clearly labelled development section.
 
 ### Fixed
 

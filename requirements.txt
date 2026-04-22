@@ -1,3 +1,10 @@
+# ── Development / testing dependencies ──────────────────────────────────────
+# Install with: pip install pytest pytest-qt
+# These are not required to run VERA itself.
+pytest==9.0.3
+pytest-qt==4.5.0
+
+# ── Runtime dependencies ─────────────────────────────────────────────────────
 asttokens==3.0.0
 beautifulsoup4==4.14.2
 biopython==1.85

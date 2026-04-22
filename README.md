@@ -408,13 +408,27 @@ Releases are available from **GROMACS 2025.1** through **2026.1** and will conti
 vera/
 ├── main.py                       # Application entry point
 ├── vera.py                       # Thin launcher (calls main.py)
-├── requirements.txt              # Python dependencies
+├── requirements.txt              # Python dependencies (runtime + dev)
 ├── build_resources.py            # Qt resource compiler script
+├── pytest.ini                    # Pytest configuration
 ├── vera.ico                      # Application icon
 ├── vera.png                      # VERA logo
 ├── LICENSE                       # MIT License
 ├── README.md                     # This file
 ├── CONTRIBUTING.md               # Contribution guidelines
+│
+├── tests/                        # Automated test suite (pytest, 308 tests)
+│   ├── conftest.py               # QApplication fixture + lightweight node mode
+│   ├── test_port_types.py        # Type system unit tests
+│   ├── test_data_mod_helpers.py  # _to_rows / _coerce_number unit tests
+│   ├── test_data_mod_nodes.py    # Data-manipulation node execute() tests
+│   ├── test_script_nodes.py      # PythonScriptNode execute() + validate()
+│   ├── test_plot_helpers.py      # Plot utility function tests
+│   ├── test_plot_nodes.py        # Plot node PNG-output smoke tests
+│   ├── test_chem_nodes.py        # MolDescriptorNode, MolFingerprintNode, SMARTSFilterNode
+│   ├── test_ml_nodes.py          # All ML nodes + helper functions (real sklearn)
+│   ├── test_utility_nodes.py     # NoteNode execute/validate/color helpers
+│   └── test_io_helpers.py        # _as_path_list, XYZ format helpers (real RDKit)
 │
 ├── core/                         # Core UI and workflow components
 │   ├── application.py            # VERAApplication — main window orchestrator
@@ -485,6 +499,8 @@ vera/
 | Biopython | ≥1.81 | BSD-3 | Bioinformatics utilities |
 | Pillow | 10.0.0 | HPND | Image processing |
 | plotly | 5.17.0 | MIT | Interactive plotting |
+| pytest *(dev)* | ≥9.0 | MIT | Automated test runner |
+| pytest-qt *(dev)* | ≥4.5 | MIT | Qt application fixture for tests |
 
 ### External Engines
 
@@ -574,6 +590,26 @@ vera/
 | Theme count | 5 (AMOLED Dark, Dracula, Nord, Win11 Dark, System Default) |
 | Workflow format | JSON-based `.vsw` with atomic writes |
 | License | MIT |
+
+---
+
+## Running Tests
+
+VERA ships with a pytest test suite in the `tests/` directory. Tests run fully headless — no display or VERA window is opened.
+
+```bash
+# Install dev dependencies (one-time)
+pip install pytest pytest-qt
+
+# Run the full suite
+python -m pytest tests/ -v
+```
+
+Expected output: **308 tests pass** in under 10 seconds.
+
+The suite covers the core type system, all data-manipulation node `execute()` methods, the Python Script node (`execute()` and `validate()`), plot helper utilities, PNG-output smoke tests for all plot node types, cheminformatics nodes (descriptors, fingerprints, SMARTS filter) using real RDKit molecules, all machine learning nodes using real sklearn estimators, the Note utility node, and I/O helper functions. No mocking — all tests exercise real library objects.
+
+For details on adding tests for new nodes, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ---
 

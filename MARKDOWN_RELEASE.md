@@ -1,4 +1,4 @@
-##  v1.1.2 ( 2026-05-17)
+##  v1.1.2 ( 2026-06-02)
 
 This patch release improves VERA's developer-facing maintainability by organizing each built-in workflow node into its own file while keeping the existing node library and workflow behavior unchanged.
 

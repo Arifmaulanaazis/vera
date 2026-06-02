@@ -126,6 +126,7 @@ Thumbs.db
 *.pyd
 *.tmp
 *.temp
+/log
 
 # Compiled Qt resources
 assets/vera_resources.py

@@ -1,4 +1,4 @@
-"""
+﻿"""
 Tests for nodes/utility_nodes.py
 
 Covers NoteNode: execute(), validate(), set_property(), and color helpers.
@@ -11,7 +11,7 @@ import pytest
 class TestNoteNodeExecute:
     @pytest.fixture(autouse=True)
     def setup(self, lightweight):
-        from nodes.utility_nodes import NoteNode
+        from nodes.utility import NoteNode
         self.node = NoteNode()
 
     def test_execute_returns_empty_dict(self):
@@ -30,7 +30,7 @@ class TestNoteNodeExecute:
 class TestNoteNodeValidate:
     @pytest.fixture(autouse=True)
     def setup(self, lightweight):
-        from nodes.utility_nodes import NoteNode
+        from nodes.utility import NoteNode
         self.node = NoteNode()
 
     def test_validate_always_true(self):
@@ -55,7 +55,7 @@ class TestNoteNodeValidate:
 class TestNoteNodeProperties:
     @pytest.fixture(autouse=True)
     def setup(self, lightweight):
-        from nodes.utility_nodes import NoteNode
+        from nodes.utility import NoteNode
         self.node = NoteNode()
 
     def test_default_text(self):
@@ -95,7 +95,7 @@ class TestNoteNodeProperties:
 class TestNoteNodeColorHelpers:
     @pytest.fixture(autouse=True)
     def setup(self, lightweight):
-        from nodes.utility_nodes import NoteNode
+        from nodes.utility import NoteNode
         self.node = NoteNode()
 
     def test_color_key_yellow(self):

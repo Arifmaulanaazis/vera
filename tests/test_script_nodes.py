@@ -1,5 +1,5 @@
-"""
-Tests for nodes/script_nodes.py — PythonScriptNode
+﻿"""
+Tests for nodes/script_nodes.py â€” PythonScriptNode
 
 Covers: execute() behaviour and validate() syntax checking.
 Uses the ``lightweight`` fixture so the QPlainTextEdit editor is not built.
@@ -11,7 +11,7 @@ import pytest
 class TestPythonScriptNodeExecute:
     @pytest.fixture(autouse=True)
     def setup(self, lightweight):
-        from nodes.script_nodes import PythonScriptNode
+        from nodes.script import PythonScriptNode
         self.node = PythonScriptNode()
 
     def test_basic_passthrough(self):
@@ -76,7 +76,7 @@ class TestPythonScriptNodeExecute:
 class TestPythonScriptNodeValidate:
     @pytest.fixture(autouse=True)
     def setup(self, lightweight):
-        from nodes.script_nodes import PythonScriptNode
+        from nodes.script import PythonScriptNode
         self.node = PythonScriptNode()
 
     def test_valid_script_passes(self):

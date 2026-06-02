@@ -1,3 +1,55 @@
+##  v1.1.2 ( 2026-05-17)
+
+This patch release improves VERA's developer-facing maintainability by organizing each built-in workflow node into its own file while keeping the existing node library and workflow behavior unchanged.
+
+---
+
+##  Highlights
+
+*  **One-node-per-file layout** makes node implementations easier to browse and maintain
+*  **Category packages** group node files under focused folders
+*  **Compatibility wrappers** preserve imports such as `nodes.plot_nodes`
+*  **Data-driven registry** keeps built-in node loading centralized and easier to extend
+
+---
+
+##  Added
+
+###  Developer Experience
+
+* **Modular node packages** (`nodes/`)
+  Each concrete built-in workflow node class now lives in its own file under its category folder.
+  Shared imports, helper functions, and internal base classes remain in each package's `common.py`.
+
+  * 110 split node files
+  * 18 node category packages
+  * Compatibility wrappers for the previous `nodes.*_nodes` module paths
+
+---
+
+##  Changed
+
+* Reorganized **110 built-in node classes** into **18 category packages** without changing node types, ports, execution semantics, or `.vsw` workflow compatibility.
+* Simplified `NodeFactory` registration into a data-driven built-in registry while preserving plugin loading.
+* Updated README project structure and technical counts to describe the new modular node layout.
+
+---
+
+##  Fixed
+
+* **FloatingNodePicker** now uses external plugin `icon_relpath` metadata, so plugin nodes show the same custom icons in the floating compatible-node picker as they do in the main toolbox.
+
+---
+
+##  Release Summary
+
+* **0 new nodes added**
+* **0 new categories introduced**
+* 110 node implementations split into individual files
+* Existing workflows and import paths remain compatible
+
+---
+
 ##  v1.1.1 ( 2026-04-20)
 
 This patch release resolves six stability issues across node execution, data handling, and error reporting — improving robustness in headless environments, multi-index DataFrames, and error-path behaviors throughout the workflow engine.

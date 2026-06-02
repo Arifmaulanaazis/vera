@@ -1,18 +1,18 @@
-"""
+﻿"""
 Tests for nodes/ml_nodes.py
 
 Covers: MLTrainTestSplitNode, LogisticRegressionNode, RandomForestClassifierNode,
 SVMClassifierNode, KNNClassifierNode, LinearRegressionNode,
 RandomForestRegressorNode, SVRNode.
 
-All tests use real sklearn + pandas — no mocking.
+All tests use real sklearn + pandas â€” no mocking.
 """
 
 import pytest
 
 
 # ---------------------------------------------------------------------------
-# Shared helpers — build real DataFrames for training
+# Shared helpers â€” build real DataFrames for training
 # ---------------------------------------------------------------------------
 
 def _classification_df(n=60):
@@ -56,21 +56,21 @@ def _split_df(df, target_col: str, test_size: float = 0.25):
 class TestMlNodeHelpers:
     def test_is_dataframe_true(self):
         pd = pytest.importorskip("pandas")
-        from nodes.ml_nodes import _is_dataframe
+        from nodes.ml import _is_dataframe
         df = pd.DataFrame({"a": [1, 2]})
         assert _is_dataframe(df) is True
 
     def test_is_dataframe_false_for_list(self):
-        from nodes.ml_nodes import _is_dataframe
+        from nodes.ml import _is_dataframe
         assert _is_dataframe([{"a": 1}]) is False
 
     def test_is_dataframe_false_for_none(self):
-        from nodes.ml_nodes import _is_dataframe
+        from nodes.ml import _is_dataframe
         assert _is_dataframe(None) is False
 
     def test_to_dataframe_from_list_of_dicts(self):
         pytest.importorskip("pandas")
-        from nodes.ml_nodes import _to_dataframe
+        from nodes.ml import _to_dataframe
         rows = [{"a": 1, "b": 2}, {"a": 3, "b": 4}]
         df, _ = _to_dataframe(rows)
         assert df is not None
@@ -78,20 +78,20 @@ class TestMlNodeHelpers:
 
     def test_to_dataframe_from_dataframe(self):
         pd = pytest.importorskip("pandas")
-        from nodes.ml_nodes import _to_dataframe
+        from nodes.ml import _to_dataframe
         orig = pd.DataFrame({"x": [1, 2]})
         df, _ = _to_dataframe(orig)
         assert df is orig
 
     def test_to_dataframe_from_none(self):
-        from nodes.ml_nodes import _to_dataframe
+        from nodes.ml import _to_dataframe
         df, rows = _to_dataframe(None)
         assert df is None
         assert rows == []
 
     def test_numeric_columns_of(self):
         pd = pytest.importorskip("pandas")
-        from nodes.ml_nodes import _numeric_columns_of
+        from nodes.ml import _numeric_columns_of
         df = pd.DataFrame({"x": [1.0, 2.0], "label": ["a", "b"], "flag": [True, False]})
         cols = _numeric_columns_of(df)
         assert "x" in cols
@@ -107,7 +107,7 @@ class TestMLTrainTestSplitNode:
     def setup(self, lightweight):
         pytest.importorskip("pandas")
         pytest.importorskip("sklearn")
-        from nodes.ml_nodes import MLTrainTestSplitNode
+        from nodes.ml import MLTrainTestSplitNode
         self.node = MLTrainTestSplitNode()
 
     def test_basic_split_sizes(self):
@@ -125,7 +125,7 @@ class TestMLTrainTestSplitNode:
         self.node.set_property("test_size", 0.3)
         self.node.set_property("stratify", False)
         result = self.node.execute({"data": df})
-        # 30 ± 2 test rows (sklearn rounding)
+        # 30 Â± 2 test rows (sklearn rounding)
         assert 28 <= len(result["test_data"]) <= 32
 
     def test_no_data_raises(self):
@@ -172,7 +172,7 @@ class TestLogisticRegressionNode:
     def setup(self, lightweight):
         pytest.importorskip("pandas")
         pytest.importorskip("sklearn")
-        from nodes.ml_nodes import LogisticRegressionNode
+        from nodes.ml import LogisticRegressionNode
         self.node = LogisticRegressionNode()
 
     def _inputs(self):
@@ -239,7 +239,7 @@ class TestRandomForestClassifierNode:
     def setup(self, lightweight):
         pytest.importorskip("pandas")
         pytest.importorskip("sklearn")
-        from nodes.ml_nodes import RandomForestClassifierNode
+        from nodes.ml import RandomForestClassifierNode
         self.node = RandomForestClassifierNode()
 
     def _inputs(self):
@@ -284,7 +284,7 @@ class TestSVMClassifierNode:
     def setup(self, lightweight):
         pytest.importorskip("pandas")
         pytest.importorskip("sklearn")
-        from nodes.ml_nodes import SVMClassifierNode
+        from nodes.ml import SVMClassifierNode
         self.node = SVMClassifierNode()
 
     def _inputs(self):
@@ -326,7 +326,7 @@ class TestKNNClassifierNode:
     def setup(self, lightweight):
         pytest.importorskip("pandas")
         pytest.importorskip("sklearn")
-        from nodes.ml_nodes import KNNClassifierNode
+        from nodes.ml import KNNClassifierNode
         self.node = KNNClassifierNode()
 
     def _inputs(self):
@@ -363,7 +363,7 @@ class TestLinearRegressionNode:
     def setup(self, lightweight):
         pytest.importorskip("pandas")
         pytest.importorskip("sklearn")
-        from nodes.ml_nodes import LinearRegressionNode
+        from nodes.ml import LinearRegressionNode
         self.node = LinearRegressionNode()
 
     def _inputs(self):
@@ -405,7 +405,7 @@ class TestRandomForestRegressorNode:
     def setup(self, lightweight):
         pytest.importorskip("pandas")
         pytest.importorskip("sklearn")
-        from nodes.ml_nodes import RandomForestRegressorNode
+        from nodes.ml import RandomForestRegressorNode
         self.node = RandomForestRegressorNode()
 
     def _inputs(self):
@@ -439,7 +439,7 @@ class TestSVRNode:
     def setup(self, lightweight):
         pytest.importorskip("pandas")
         pytest.importorskip("sklearn")
-        from nodes.ml_nodes import SVRNode
+        from nodes.ml import SVRNode
         self.node = SVRNode()
 
     def _inputs(self):

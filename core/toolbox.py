@@ -122,6 +122,18 @@ except ImportError:
             return QIcon(pix)
 
 
+def load_node_icon_with_override(node_type: str, display_name: str, icon_path=None) -> QIcon:
+    """Load a plugin-provided icon when present, otherwise use the themed fallback."""
+    if icon_path:
+        try:
+            icon = QIcon(str(icon_path))
+            if not icon.isNull():
+                return icon
+        except Exception:
+            pass
+    return load_node_icon(node_type, display_name)
+
+
 class CollapsibleSection(QWidget):
     """A collapsible accordion section with a header and a content area."""
 
@@ -441,8 +453,10 @@ class NodeCategoryWidget(QWidget):
     def add_node(self, node_type: str, display_name: str, description: str = ""):
         """Add a node tool item with an icon and a label beneath it."""
         icon = self._icon_loader(node_type, display_name)
-        # Build a small vertical widget: [circle button]
-        #                                  display name
+        self.add_node_with_icon(node_type, display_name, description, icon)
+
+    def add_node_with_icon(self, node_type: str, display_name: str, description: str, icon: QIcon):
+        """Add a node tool item using a pre-resolved icon."""
         container = QWidget(self)
         v = QVBoxLayout(container)
         v.setContentsMargins(2, 2, 2, 2)
@@ -931,45 +945,12 @@ class NodeToolbox(QWidget):
             def _make_adder(items):
                 def add_plugin_nodes(cat: NodeCategoryWidget):
                     for it in items:
-                        # If plugin provided a custom icon path, load it as a QIcon; else use theme fallback
-                        if getattr(it, "icon_path", None):
-                            try:
-                                icon = QIcon(str(it.icon_path))
-                                # Manual add using internal widget builder to force icon
-                                # Build container similar to add_node()
-                                container = QWidget(cat)
-                                v = QVBoxLayout(container)
-                                v.setContentsMargins(2, 2, 2, 2)
-                                v.setSpacing(4)
-                                btn = NodeIconButton(it.node_type, icon, tooltip=it.description)
-                                btn.clicked.connect(lambda checked=False, nt=it.node_type: cat.node_requested.emit(nt))
-                                v.addWidget(btn, alignment=Qt.AlignHCenter)
-                                label = QLabel(it.display_name)
-                                label.setAlignment(Qt.AlignHCenter | Qt.AlignTop)
-                                label.setWordWrap(True)
-                                label.setStyleSheet("QLabel { color: #d0d0d0; font-size: 10px; padding: 0; margin: 0; }")
-                                if it.description:
-                                    label.setToolTip(it.description)
-                                v.addWidget(label)
-                                row = cat._count // cat._columns
-                                col = cat._count % cat._columns
-                                cat._grid.addWidget(container, row, col, alignment=Qt.AlignCenter)
-                                cat._count += 1
-                                try:
-                                    searchable = f"{it.node_type} {it.display_name} {it.description}".lower()
-                                except Exception:
-                                    searchable = f"{it.node_type} {it.display_name}".lower()
-                                cat._items.append({
-                                    "node_type": it.node_type,
-                                    "display_name": it.display_name,
-                                    "container": container,
-                                    "search": searchable,
-                                })
-                            except Exception:
-                                # Fallback to theme icon
-                                cat.add_node(it.node_type, it.display_name, it.description)
-                        else:
-                            cat.add_node(it.node_type, it.display_name, it.description)
+                        icon = load_node_icon_with_override(
+                            it.node_type,
+                            it.display_name,
+                            getattr(it, "icon_path", None),
+                        )
+                        cat.add_node_with_icon(it.node_type, it.display_name, it.description, icon)
                 return add_plugin_nodes
             self._add_category(str(category_name), _make_adder(list(nodes)))
 

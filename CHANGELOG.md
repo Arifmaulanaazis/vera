@@ -7,6 +7,24 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [1.1.2] — 2026-05-17
+
+### Added
+
+- **Modular node packages** (`nodes/`) — each concrete built-in workflow node now has its own file inside a category package, with shared helpers kept in each package's `common.py`. Legacy modules such as `nodes.plot_nodes` and `nodes.io_nodes` remain available as compatibility wrappers.
+
+### Changed
+
+- Reorganized **110 built-in node classes** into **18 category packages** to make the node library easier to browse, review, and maintain without changing node types, ports, execution behavior, or `.vsw` workflow compatibility.
+- Simplified `nodes/node_factory.py` from repeated import/register blocks into a data-driven built-in registry while preserving plugin loading after the built-in nodes are registered.
+- Updated README project structure and technical counts to document the new one-node-per-file layout.
+
+### Fixed
+
+- **FloatingNodePicker**: external plugin nodes with custom `icon_relpath` used the built-in theme icon resolver instead of the plugin toolbox metadata, so plugin icons could appear in the main toolbox but disappear from the floating compatible-node picker. Floating picker icon loading now reuses the plugin `icon_path` metadata and falls back to the themed icon only when no plugin icon is available.
+
+---
+
 ## [1.1.1] — 2026-04-22
 
 ### Added
@@ -186,6 +204,7 @@ PySide6 ≥ 6.6.0, RDKit ≥ 2023.9.1, ProLIF ≥ 2.0.0, scikit-learn ≥ 1.1.0,
 
 ---
 
+[1.1.2]: https://github.com/Arifmaulanaazis/vera/compare/1.1.1...1.1.2
 [1.1.1]: https://github.com/Arifmaulanaazis/vera/compare/1.1.0...1.1.1
 [1.1.0]: https://github.com/Arifmaulanaazis/vera/compare/1.0.0...1.1.0
 [1.0.0]: https://github.com/Arifmaulanaazis/vera/releases/tag/1.0.0

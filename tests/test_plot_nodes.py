@@ -1,4 +1,4 @@
-"""
+﻿"""
 Tests for execute() methods in nodes/plot_nodes.py
 
 Each node produces PNG bytes on its ``plot_image`` output port.
@@ -22,7 +22,7 @@ def _is_valid_png(data) -> bool:
 class TestHistogramPlotNode:
     @pytest.fixture(autouse=True)
     def setup(self, lightweight):
-        from nodes.plot_nodes import HistogramPlotNode
+        from nodes.plot import HistogramPlotNode
         self.node = HistogramPlotNode()
 
     def test_returns_png_bytes_from_values(self):
@@ -47,7 +47,7 @@ class TestHistogramPlotNode:
 class TestScatterPlotNode:
     @pytest.fixture(autouse=True)
     def setup(self, lightweight):
-        from nodes.plot_nodes import ScatterPlotNode
+        from nodes.plot import ScatterPlotNode
         self.node = ScatterPlotNode()
 
     def test_returns_png_bytes_from_xy(self):
@@ -65,7 +65,7 @@ class TestScatterPlotNode:
 class TestLinePlotNode:
     @pytest.fixture(autouse=True)
     def setup(self, lightweight):
-        from nodes.plot_nodes import LinePlotNode
+        from nodes.plot import LinePlotNode
         self.node = LinePlotNode()
 
     def test_returns_png_bytes_from_xy(self):
@@ -83,7 +83,7 @@ class TestLinePlotNode:
 class TestBarPlotNode:
     @pytest.fixture(autouse=True)
     def setup(self, lightweight):
-        from nodes.plot_nodes import BarPlotNode
+        from nodes.plot import BarPlotNode
         self.node = BarPlotNode()
 
     def test_returns_png_bytes_from_direct_input(self):
@@ -101,7 +101,7 @@ class TestBarPlotNode:
 class TestPiePlotNode:
     @pytest.fixture(autouse=True)
     def setup(self, lightweight):
-        from nodes.plot_nodes import PiePlotNode
+        from nodes.plot import PiePlotNode
         self.node = PiePlotNode()
 
     def test_returns_png_bytes(self):
@@ -119,7 +119,7 @@ class TestPiePlotNode:
 class TestHeatmapPlotNode:
     @pytest.fixture(autouse=True)
     def setup(self, lightweight):
-        from nodes.plot_nodes import HeatmapPlotNode
+        from nodes.plot import HeatmapPlotNode
         self.node = HeatmapPlotNode()
 
     def test_matrix_input(self):

@@ -1,11 +1,11 @@
-"""
+﻿"""
 Tests for helper functions in nodes/data_mod_nodes.py
 
 _to_rows and _coerce_number are pure Python utilities with no Qt dependency.
 """
 
 import pytest
-from nodes.data_mod_nodes import _to_rows, _coerce_number
+from nodes.data_mod import _to_rows, _coerce_number
 
 
 class TestToRows:

@@ -37,7 +37,7 @@ from typing import Optional
 import json
 from nodes import node_factory
 from core.toolbox import FloatingNodePicker
-from core.toolbox import load_node_icon
+from core.toolbox import load_node_icon_with_override
 from PySide6.QtGui import QIcon
 from core.performance import ViewportOptimizer
 from core.toast import ToastOverlay
@@ -702,6 +702,17 @@ class WorkflowCanvas(QGraphicsView):
             available = node_factory.get_available_nodes()  # type: ignore[attr-defined]
         except Exception:
             return out
+
+        plugin_toolbox_items = {}
+        try:
+            from backend.plugin_manager import get_loaded_toolbox_categories
+
+            for _category, plugin_nodes in get_loaded_toolbox_categories():
+                for item in plugin_nodes:
+                    plugin_toolbox_items[str(item.node_type)] = item
+        except Exception:
+            plugin_toolbox_items = {}
+
         for node_type, cls in available.items():
             try:
                 sig = self._port_signature_cache.get(node_type)
@@ -784,8 +795,18 @@ class WorkflowCanvas(QGraphicsView):
                             break
                 if not ok:
                     continue
-                title = str(sig.get("title", node_type))
-                icon = load_node_icon(node_type, title)
+                plugin_item = plugin_toolbox_items.get(node_type)
+                if plugin_item is not None:
+                    title = str(getattr(plugin_item, "display_name", None) or sig.get("title", node_type))
+                    icon_path = getattr(plugin_item, "icon_path", None)
+                else:
+                    title = str(sig.get("title", node_type))
+                    icon_path = None
+                icon = load_node_icon_with_override(
+                    node_type,
+                    title,
+                    icon_path,
+                )
                 out.append((node_type, title, icon))
             except Exception:
                 continue

@@ -31,11 +31,15 @@ def setup_logging(log_level: str = "INFO", log_file: Optional[str] = None):
     
     # Always log to a file
     if not log_file:
-        default_log_dir = Path(os.path.expanduser("~")) / "tds"
+        app_root_dir = Path(__file__).resolve().parent.parent
+        default_log_dir = app_root_dir / "log"
         default_log_dir.mkdir(parents=True, exist_ok=True)
-        log_file = default_log_dir / "app"
+        log_file = default_log_dir / "app.log"
     
-    file_handler = logging.FileHandler(log_file, encoding='utf-8')
+    from logging.handlers import TimedRotatingFileHandler
+    file_handler = TimedRotatingFileHandler(
+        log_file, when="midnight", interval=1, backupCount=30, encoding='utf-8'
+    )
     file_handler.setLevel(getattr(logging, log_level.upper()))
     file_handler.setFormatter(formatter)
     logger.addHandler(file_handler)

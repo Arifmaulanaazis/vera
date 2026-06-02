@@ -1,15 +1,15 @@
-"""
+﻿"""
 Tests for nodes/chem_nodes.py
 
 Covers MolDescriptorNode, MolFingerprintNode, and SMARTSFilterNode.
-All tests use real RDKit molecules — no mocking.
+All tests use real RDKit molecules â€” no mocking.
 """
 
 import pytest
 
 
 # ---------------------------------------------------------------------------
-# Shared helper — build real RDKit molecules from SMILES
+# Shared helper â€” build real RDKit molecules from SMILES
 # ---------------------------------------------------------------------------
 
 def _mol(smiles: str):
@@ -36,7 +36,7 @@ class TestMolDescriptorNode:
     def setup(self, lightweight):
         pytest.importorskip("rdkit")
         pytest.importorskip("pandas")
-        from nodes.chem_nodes import MolDescriptorNode
+        from nodes.chem import MolDescriptorNode
         self.node = MolDescriptorNode()
 
     def test_lipinski_preset_returns_dataframe(self):
@@ -127,7 +127,7 @@ class TestMolFingerprintNode:
     def setup(self, lightweight):
         pytest.importorskip("rdkit")
         pytest.importorskip("pandas")
-        from nodes.chem_nodes import MolFingerprintNode
+        from nodes.chem import MolFingerprintNode
         self.node = MolFingerprintNode()
 
     def test_morgan_returns_dataframe(self):
@@ -168,7 +168,7 @@ class TestMolFingerprintNode:
 
     def test_topologicaltorsion_fingerprint(self):
         # TopologicalTorsion BitVect may not exist in all RDKit builds.
-        # The node either returns a DataFrame or raises ValueError — both are valid.
+        # The node either returns a DataFrame or raises ValueError â€” both are valid.
         from rdkit.Chem import rdMolDescriptors
         self.node.set_property("fp_type", "TopologicalTorsion")
         mols = _mols("c1ccccc1CC")
@@ -243,7 +243,7 @@ class TestSMARTSFilterNode:
     @pytest.fixture(autouse=True)
     def setup(self, lightweight):
         pytest.importorskip("rdkit")
-        from nodes.chem_nodes import SMARTSFilterNode
+        from nodes.chem import SMARTSFilterNode
         self.node = SMARTSFilterNode()
 
     def _aromatic_mols(self):

@@ -3,7 +3,7 @@ from datetime import datetime
 APP_INFO = {
     "name": "VERA",
     "full_name": "VERA: Virtual Execution and Reaction Architecture",
-    "version": "1.1.1",
+    "version": "1.1.2",
     "author": "apt. Arif Maulana Azis, S.Farm",
     "organization": "VERA",
     "copyright": f"© {datetime.now().year} VERA, All Rights Reserved.",

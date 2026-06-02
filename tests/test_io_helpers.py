@@ -1,4 +1,4 @@
-"""
+﻿"""
 Tests for helper functions in nodes/io_nodes.py
 
 Covers: _as_path_list, _validate_xyz_format, _parse_xyz_molecule,
@@ -19,7 +19,7 @@ import pytest
 class TestAsPathList:
     @pytest.fixture(autouse=True)
     def _import(self):
-        from nodes.io_nodes import _as_path_list
+        from nodes.io import _as_path_list
         self._fn = _as_path_list
 
     def test_none_returns_empty(self):
@@ -120,7 +120,7 @@ class TestAsPathList:
 class TestValidateXyzFormat:
     @pytest.fixture(autouse=True)
     def _import(self):
-        from nodes.io_nodes import _validate_xyz_format
+        from nodes.io import _validate_xyz_format
         self._fn = _validate_xyz_format
 
     def _valid_xyz_lines(self):
@@ -192,7 +192,7 @@ class TestParseXyzMolecule:
     @pytest.fixture(autouse=True)
     def _import(self):
         pytest.importorskip("rdkit")
-        from nodes.io_nodes import _parse_xyz_molecule
+        from nodes.io import _parse_xyz_molecule
         self._fn = _parse_xyz_molecule
 
     def _water_lines(self):
@@ -242,7 +242,7 @@ class TestCreateXyzContent:
     @pytest.fixture(autouse=True)
     def _import(self):
         pytest.importorskip("rdkit")
-        from nodes.io_nodes import _create_xyz_content
+        from nodes.io import _create_xyz_content
         self._fn = _create_xyz_content
 
     def _ethanol_mol(self):

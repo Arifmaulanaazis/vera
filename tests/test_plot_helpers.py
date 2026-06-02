@@ -1,4 +1,4 @@
-"""
+﻿"""
 Tests for helper functions in nodes/plot_nodes.py
 
 _as_numeric_list, _as_dataframe, _extract_series_from_table, and
@@ -8,7 +8,7 @@ _extract_labels_from_table are pure Python utilities with no Qt dependency.
 import math
 import pytest
 
-from nodes.plot_nodes import (
+from nodes.plot import (
     _as_numeric_list,
     _as_dataframe,
     _extract_series_from_table,

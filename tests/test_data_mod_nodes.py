@@ -1,4 +1,4 @@
-"""
+﻿"""
 Tests for node execute() methods in nodes/data_mod_nodes.py
 
 Each test instantiates the node with _lightweight_construction=True
@@ -16,7 +16,7 @@ import pytest
 class TestSelectColumnsNode:
     @pytest.fixture(autouse=True)
     def setup(self, lightweight):
-        from nodes.data_mod_nodes import SelectColumnsNode
+        from nodes.data_mod import SelectColumnsNode
         self.node = SelectColumnsNode()
 
     def test_no_columns_returns_all_rows(self):
@@ -75,7 +75,7 @@ class TestSelectColumnsNode:
 class TestFilterRowsNode:
     @pytest.fixture(autouse=True)
     def setup(self, qapp):
-        from nodes.data_mod_nodes import FilterRowsNode
+        from nodes.data_mod import FilterRowsNode
         self.node = FilterRowsNode()
 
     def _data(self):
@@ -202,7 +202,7 @@ class TestFilterRowsNode:
 class TestSliceRowsNode:
     @pytest.fixture(autouse=True)
     def setup(self, qapp):
-        from nodes.data_mod_nodes import SliceRowsNode
+        from nodes.data_mod import SliceRowsNode
         self.node = SliceRowsNode()
 
     def _data(self, n=10):
@@ -255,7 +255,7 @@ class TestSliceRowsNode:
 class TestDropDuplicatesNode:
     @pytest.fixture(autouse=True)
     def setup(self, qapp):
-        from nodes.data_mod_nodes import DropDuplicatesNode
+        from nodes.data_mod import DropDuplicatesNode
         self.node = DropDuplicatesNode()
 
     def test_no_duplicates_unchanged(self):
@@ -311,7 +311,7 @@ class TestDropDuplicatesNode:
 class TestSortRowsNode:
     @pytest.fixture(autouse=True)
     def setup(self, qapp):
-        from nodes.data_mod_nodes import SortRowsNode
+        from nodes.data_mod import SortRowsNode
         self.node = SortRowsNode()
 
     def _data(self):
@@ -374,7 +374,7 @@ class TestSortRowsNode:
 class TestDataframeMergeNode:
     @pytest.fixture(autouse=True)
     def setup(self, qapp):
-        from nodes.data_mod_nodes import DataframeMergeNode
+        from nodes.data_mod import DataframeMergeNode
         self.node = DataframeMergeNode()
 
     def _left(self):

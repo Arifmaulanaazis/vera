@@ -133,25 +133,26 @@ When external tools require file-based input (e.g., Vina requires PDBQT), nodes 
 
 ## Node Library
 
-VERA ships with **112 built-in nodes** organized into **17 functional categories**:
+VERA ships with **110 built-in nodes** organized into **18 functional categories**:
 
 | Category | Nodes | Key Capabilities |
 |----------|:-----:|-------------------|
 | **Molecular Docking** | 10 | AutoDock Vina (CPU/GPU), batch docking, grid box search, receptor/ligand preparation |
-| **Batch Docking** | 1 | High-throughput AutoDock Vina batch virtual screening |
+| **Molecular Minimization** | 3 | RDKit/OpenBabel minimization, ETKDG conformer generation |
 | **Molecular Dynamics** | 10 | GROMACS minimization, equilibration, production, CHARMM-GUI, analysis, trajectory extraction |
-| **Molecular Preparation** | 3 | RDKit/OpenBabel minimization, ETKDG conformer generation |
-| **Molecular I/O** | 9 | SMILES input, SDF/MOL/MOL2/PDB/PDBQT/XYZ readers, molecule writer |
-| **Cheminformatics** | 3 | RDKit descriptors, molecular fingerprints (Morgan/MACCS/RDKit), SMARTS substructure filter |
-| **Data I/O** | 22 | SDF/MOL/MOL2/PDB/PDBQT/XYZ/CSV/Excel readers, writers, viewers, databases |
-| **Data Manipulation** | 6 | Column selection, row filtering, sorting, deduplication, merging |
+| **Chemical Visualization** | 3 | 2D structure rendering, ProLIF interaction visualization, NGL.js 3D viewer |
+| **Plotting** | 20 | Histogram, scatter, line, bar, heatmap, pair plot, and other plot outputs |
+| **Chemical Data Scraping** | 2 | PubChem compound search and RCSB PDB retrieval |
+| **Dataframe Modification** | 6 | Column selection, row filtering, sorting, deduplication, merging |
+| **General Input/Output** | 15 | File/folder inputs, tabular readers, savers, text/table/image viewers |
+| **Molecular Input/Output** | 9 | SMILES input, SDF/MOL/MOL2/PDB/PDBQT/XYZ readers, molecule writer |
 | **Machine Learning** | 8 | Train/test split, logistic regression, random forest, SVM, KNN, SVR |
 | **Model Evaluation** | 3 | Confusion matrix, classification report, regression metrics |
-| **Clustering & DR** | 3 | K-Means, agglomerative clustering, PCA |
-| **Visualization** | 23 | 2D structure draw, ProLIF interaction, NGL.js 3D viewer, 20 plot types |
-| **Chromatography** | 6 | Time-series reader, smoothing, baseline correction, peak detection, integration |
-| **Response Surface** | 3 | DoE preparation, model fitting, 3D surface visualization |
-| **ML Model Mgmt** | 4 | Model save/load, testing, prediction |
+| **Clustering and Dimensionality Reduction** | 3 | K-Means, agglomerative clustering, PCA |
+| **Chromatography and Spectroscopy** | 6 | Time-series reader, smoothing, baseline correction, peak detection, integration |
+| **Response Surface Analysis** | 3 | DoE preparation, model fitting, 3D surface visualization |
+| **ML Model Management** | 4 | Model save/load, testing, prediction |
+| **Cheminformatics** | 3 | RDKit descriptors, molecular fingerprints (Morgan/MACCS/RDKit), SMARTS substructure filter |
 | **Scripting** | 1 | Custom Python script node (inline editor, access to all inputs/outputs) |
 | **Utilities** | 1 | Sticky note / comment node for workflow documentation |
 
@@ -417,7 +418,7 @@ vera/
 ├── README.md                     # This file
 ├── CONTRIBUTING.md               # Contribution guidelines
 │
-├── tests/                        # Automated test suite (pytest, 308 tests)
+├── tests/                        # Automated test suite (pytest, 309 tests)
 │   ├── conftest.py               # QApplication fixture + lightweight node mode
 │   ├── test_port_types.py        # Type system unit tests
 │   ├── test_data_mod_helpers.py  # _to_rows / _coerce_number unit tests
@@ -428,7 +429,8 @@ vera/
 │   ├── test_chem_nodes.py        # MolDescriptorNode, MolFingerprintNode, SMARTSFilterNode
 │   ├── test_ml_nodes.py          # All ML nodes + helper functions (real sklearn)
 │   ├── test_utility_nodes.py     # NoteNode execute/validate/color helpers
-│   └── test_io_helpers.py        # _as_path_list, XYZ format helpers (real RDKit)
+│   ├── test_io_helpers.py        # _as_path_list, XYZ format helpers (real RDKit)
+│   └── test_plugin_icons.py      # Plugin icon propagation into the floating node picker
 │
 ├── core/                         # Core UI and workflow components
 │   ├── application.py            # VERAApplication — main window orchestrator
@@ -442,15 +444,17 @@ vera/
 ├── backend/
 │   └── workflow_manager.py       # WorkflowManager — DAG execution engine
 │
-├── nodes/                        # All built-in node implementations
-│   ├── node_factory.py           # NodeFactory — registry and loader
-│   ├── docking_nodes.py          # AutoDock Vina nodes
-│   ├── md_nodes.py               # GROMACS molecular dynamics nodes
-│   ├── io_nodes.py               # File I/O nodes (SDF, MOL, PDB, CSV, etc.)
-│   ├── data_mod_nodes.py         # DataFrame manipulation nodes
-│   ├── visualization_nodes.py    # Plotting and 3D viewer nodes
-│   ├── ml_nodes.py               # Machine learning nodes (sklearn)
-│   └── ...                       # Other node modules by category
+├── nodes/                        # Built-in node implementations (one node per file)
+│   ├── node_factory.py           # Data-driven registry and plugin handoff
+│   ├── *_nodes.py                # Compatibility wrappers for legacy imports
+│   ├── docking/                  # AutoDock Vina node files + shared common.py
+│   ├── md/                       # GROMACS molecular dynamics node files
+│   ├── io/                       # File and molecular I/O node files
+│   ├── data_mod/                 # DataFrame manipulation node files
+│   ├── plot/                     # Plot node files
+│   ├── visualization/            # 2D, ProLIF, and 3D viewer node files
+│   ├── ml/                       # Machine learning node files
+│   └── ...                       # Other category packages with common.py helpers
 │
 ├── UI/                           # Qt dialogs and UI components
 ├── utils/                        # Logging, theming, external tool helpers
@@ -578,10 +582,10 @@ vera/
 
 | Metric | Value |
 |--------|-------|
-| Total Python source files | ~39 |
-| Lines of code | ~26,500 |
-| Built-in node types | 112 |
-| Node categories | 16 |
+| Total Python source files | ~218 first-party |
+| Lines of code | ~90,700 first-party |
+| Built-in node types | 110 |
+| Node categories | 18 |
 | Port data types | 9 canonical + synonyms |
 | External engine integrations | 5 (Vina CPU, Vina GPU, GROMACS, OpenBabel, NGL.js) |
 | Web service integrations | 2 (PubChem, RCSB PDB) |
@@ -605,9 +609,9 @@ pip install pytest pytest-qt
 python -m pytest tests/ -v
 ```
 
-Expected output: **308 tests pass** in under 10 seconds.
+Expected output: **309 tests collected** with all non-skipped tests passing in under 10 seconds.
 
-The suite covers the core type system, all data-manipulation node `execute()` methods, the Python Script node (`execute()` and `validate()`), plot helper utilities, PNG-output smoke tests for all plot node types, cheminformatics nodes (descriptors, fingerprints, SMARTS filter) using real RDKit molecules, all machine learning nodes using real sklearn estimators, the Note utility node, and I/O helper functions. No mocking — all tests exercise real library objects.
+The suite covers the core type system, all data-manipulation node `execute()` methods, the Python Script node (`execute()` and `validate()`), plot helper utilities, PNG-output smoke tests for all plot node types, cheminformatics nodes (descriptors, fingerprints, SMARTS filter) using real RDKit molecules, all machine learning nodes using real sklearn estimators, the Note utility node, I/O helper functions, and plugin icon propagation into the floating node picker. No mocking — all tests exercise real library objects.
 
 For details on adding tests for new nodes, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
@@ -689,6 +693,6 @@ VERA builds upon the work of the open-source scientific computing community. We 
 ---
 
 <div align="center">
-  <p><strong>apt. Arif Maulana Azis, S.Farm.</strong></p>
+  <p><strong>apt. Arif Maulana Azis, S.Farm, apt. Emiliana Puspa Wanica, S.Farm</strong></p>
   <p><em>Empowering scientific discovery through visual workflow automation</em></p>
 </div>
